@@ -1,0 +1,51 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "remix"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/static/**/*.@(js|css|jpg|jpeg|gif|png)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=604800"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": {
+    "codebase": "remix",
+    "runtime": "nodejs16",
+    "predeploy": [
+      "npm i -w functions"
+    ]
+  },
+  "emulators": {
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8088
+    },
+    "hosting": {
+      "host": "127.0.0.1",
+      "port": 3033
+    },
+    "ui": {
+      "enabled": true
+    }
+  }
+}

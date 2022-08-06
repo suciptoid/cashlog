@@ -1,0 +1,76 @@
+name: Test & Deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11"
+      - name: Cache
+        uses: actions/cache@v3
+        id: test-npm-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cashlog-
+      - name: Install Firebase Tools
+        run: npm install -g firebase-tools --quiet
+      - name: Install App Dependencies
+        run: npm install
+      - name: Test With Firebase Emulator
+        run: firebase emulators:exec --only auth,firestore "npm run test" --project ${{ secrets.FIREBASE_PROJECT }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+  deploy:
+    name: Deploy
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: "11"
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.cache
+          key: ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}-
+      - name: Install Firebase Tools
+        run: npm install -g firebase-tools --quiet
+      - name: Install Dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Firebase Prepare
+        run: node functions/install.js
+      - name: Deploy to Firebase
+        run: firebase deploy --only functions,hosting --token ${{ secrets.FIREBASE_TOKEN }} --project ${{ secrets.FIREBASE_PROJECT }}

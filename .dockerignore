@@ -1,0 +1,11 @@
+/node_modules
+*.log
+.DS_Store
+.env
+/.cache
+/public/static
+/build
+/functions
+/.vscode
+/.firebase
+/.firebaserc

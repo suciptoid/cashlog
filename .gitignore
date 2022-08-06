@@ -1,0 +1,17 @@
+node_modules
+
+/.cache
+/.firebase
+/build
+/public/assets
+/public/static
+/coverage
+
+.env
+.DS_Store
+*.log
+app/styles
+service-account.json
+server.js
+.vercel
+.firebaserc
