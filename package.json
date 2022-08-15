@@ -31,7 +31,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.6.7",
+    "@remix-run/dev": "^1.6.8",
     "@remix-run/eslint-config": "^1.6.7",
     "@remix-run/serve": "^1.6.7",
     "@trivago/prettier-plugin-sort-imports": "^3.3.0",
