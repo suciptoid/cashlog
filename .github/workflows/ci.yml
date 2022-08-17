@@ -35,7 +35,7 @@ jobs:
       - name: Install App Dependencies
         run: npm install
       - name: Test With Firebase Emulator
-        run: firebase emulators:exec --only auth,firestore "npm run test" --project ${{ secrets.FIREBASE_PROJECT }}
+        run: firebase emulators:exec --only auth,firestore "npm run test" --project test
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
