@@ -6,9 +6,14 @@ import type {
 } from "./types";
 import { database } from "~/lib/firebase.server";
 
+/**
+ *
+ * @param book book id
+ * @param transaction Transaction
+ */
 export const createTransaction = async (
   book: string,
-  transaction: TransactionRaw
+  transaction: Omit<TransactionRaw, "id">
 ) => {
   const ref = database.ref(`/books/${book}/transactions`);
   const trx = ref.push();

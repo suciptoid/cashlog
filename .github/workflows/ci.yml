@@ -35,7 +35,7 @@ jobs:
       - name: Install App Dependencies
         run: npm install
       - name: Test With Firebase Emulator
-        run: firebase emulators:exec --only auth,firestore "npm run test" --project test
+        run: firebase emulators:exec --only auth,firestore,database "npm run test" --project test
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
@@ -73,4 +73,4 @@ jobs:
       - name: Firebase Prepare
         run: node functions/install.js
       - name: Deploy to Firebase
-        run: firebase deploy --only functions,hosting --token ${{ secrets.FIREBASE_TOKEN }} --project ${{ secrets.FIREBASE_PROJECT }}
+        run: firebase deploy --only functions,hosting,database --token ${{ secrets.FIREBASE_TOKEN }} --project ${{ secrets.FIREBASE_PROJECT }}
