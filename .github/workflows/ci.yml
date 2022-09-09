@@ -36,6 +36,8 @@ jobs:
         run: npm install
       - name: Add config
         run: echo ${{ secrets.FIREBASE_CONFIG }} > firebase.config.json
+      - name: Test
+        run: cat firebase.config.json
       - name: Test With Firebase Emulator
         run: firebase emulators:exec --only auth,firestore,database "npm run test" --project test
         env:
