@@ -40,6 +40,7 @@ jobs:
         run: firebase emulators:exec --only auth,firestore,database "npm run test" --project test
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_DATABASE_URL: https://test.firebaseio.com
 
   deploy:
     name: Deploy
