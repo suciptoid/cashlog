@@ -1,0 +1,15 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "books": {
+      "$book_id": {
+        "transactions": {
+          ".indexOn": [
+            "datePosting"
+          ]
+        }
+      }
+    }
+  }
+}

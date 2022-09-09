@@ -1,4 +1,7 @@
 {
+  "database": {
+    "rules": "app/database-rules.json"
+  },
   "hosting": {
     "public": "public",
     "ignore": [
@@ -46,6 +49,10 @@
     },
     "ui": {
       "enabled": true
+    },
+    "database": {
+      "host": "127.0.0.1",
+      "port": 9999
     }
   }
 }

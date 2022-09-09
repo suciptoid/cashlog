@@ -2,6 +2,7 @@ import { apps, credential as adminCredential } from "firebase-admin";
 import type { App, Credential } from "firebase-admin/app";
 import { applicationDefault, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getDatabase } from "firebase-admin/database";
 import { getFirestore } from "firebase-admin/firestore";
 
 let app: App;
@@ -21,6 +22,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
 if (apps.length === 0) {
   app = initializeApp({
     credential,
+    databaseURL: "https://test.firebaseio.com", // TODO: load from env
   });
 } else {
   app = apps[0]!;
@@ -28,5 +30,6 @@ if (apps.length === 0) {
 
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
+export const database = getDatabase(app);
 
 export * from "firebase-admin/firestore";
