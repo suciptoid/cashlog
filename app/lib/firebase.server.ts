@@ -1,3 +1,4 @@
+import config from "../../firebase.config.json";
 import { apps, credential as adminCredential } from "firebase-admin";
 import type { App, Credential } from "firebase-admin/app";
 import { applicationDefault, initializeApp } from "firebase-admin/app";
@@ -22,7 +23,9 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
 if (apps.length === 0) {
   app = initializeApp({
     credential,
-    databaseURL: "https://test.firebaseio.com", // TODO: load from env
+    databaseURL:
+      process.env.FIREBASE_DATABASE_URL ||
+      `https://${config.projectId}-default-rtdb.firebaseio.com`,
   });
 } else {
   app = apps[0]!;
