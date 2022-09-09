@@ -1,3 +1,4 @@
+import clientConfig from "../../firebase.config.json";
 import type {
   ActionFunction,
   AppLoadContext,
@@ -5,7 +6,6 @@ import type {
 } from "@remix-run/node";
 import type { UserRecord } from "firebase-admin/auth";
 import type { Params } from "react-router";
-import { clientConfig } from "~/lib/firebase.config";
 import { auth, firestore } from "~/lib/firebase.server";
 
 export interface MockedUser {

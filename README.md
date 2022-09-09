@@ -2,7 +2,7 @@
 
 ## Development
 - Copy `.env.example` to `.env`
-- Setup firebase client config in `app/lib/firebase.config.ts` 
+- Setup firebase client config in `./firebase.config.json` (from Project Setting>General>Your Apps) 
 - Run firebase emulator `npm run emulator`
 - Run `npm run dev`
 

@@ -1,4 +1,4 @@
-import { clientConfig } from "./firebase.config";
+import clientConfig from "../../firebase.config.json";
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";

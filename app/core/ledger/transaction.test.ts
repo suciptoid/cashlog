@@ -12,7 +12,7 @@ import { database } from "~/lib/firebase.server";
 describe("Ledger", () => {
   beforeAll(async () => {
     const res = await fetch(
-      "http:/localhost:9999/.settings/rules.json?access_token=123&ns=test",
+      "http:/127.0.0.1:9999/.settings/rules.json?access_token=123&ns=test",
       {
         method: "PUT",
         body: JSON.stringify(rules),

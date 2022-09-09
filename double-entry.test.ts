@@ -3,7 +3,7 @@ import { applicationDefault } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-process.env.FIREBASE_DATABASE_EMULATOR_HOST = "localhost:9999";
+// process.env.FIREBASE_DATABASE_EMULATOR_HOST = "127.0.0.1:9999";
 
 const app = initializeApp({
   credential: applicationDefault(),
@@ -29,7 +29,7 @@ describe("testing double entry accounting", () => {
   beforeAll(async () => {
     // Apply rules
     const res = await fetch(
-      "http:/localhost:9999/.settings/rules.json?access_token=123&ns=test",
+      "http:/127.0.0.1:9999/.settings/rules.json?access_token=123&ns=test",
       {
         method: "PUT",
         body: JSON.stringify(rules),
