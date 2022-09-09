@@ -35,9 +35,7 @@ jobs:
       - name: Install App Dependencies
         run: npm install
       - name: Add config
-        run: echo ${{ secrets.FIREBASE_CONFIG }} > firebase.config.json
-      - name: Test
-        run: cat firebase.config.json
+        run: echo '${{ secrets.FIREBASE_CONFIG }}'' > firebase.config.json
       - name: Test With Firebase Emulator
         run: firebase emulators:exec --only auth,firestore,database "npm run test" --project test
         env:
@@ -71,7 +69,7 @@ jobs:
       - name: Install Firebase Tools
         run: npm install -g firebase-tools --quiet
       - name: Add config
-        run: echo ${{ secrets.FIREBASE_CONFIG }} > firebase.config.json
+        run: echo '${{ secrets.FIREBASE_CONFIG }}' > firebase.config.json
       - name: Install Dependencies
         run: npm install
       - name: Build
