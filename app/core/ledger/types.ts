@@ -24,6 +24,10 @@ export type Account = {
   accountType: AccountType;
 };
 
+export type AccountWithBalance = Account & {
+  balance: number;
+};
+
 export type TransactionEntry = {
   id?: string;
   account: string;

@@ -1,11 +1,11 @@
-import { createBook, deleteBook } from "./book";
 import {
   createAccount,
-  createTransaction,
+  getAccountBalance,
   getAccounts,
   getAccountTransactions,
-  getTransaction,
-} from "./transaction";
+} from "./account";
+import { createBook, deleteBook } from "./book";
+import { createTransaction, getTransaction } from "./transaction";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import rules from "~/database-rules.json";
 import { database } from "~/lib/firebase.server";
@@ -42,7 +42,7 @@ describe("Ledger", () => {
   });
 
   afterAll(async () => {
-    await database.ref("/books/test").set(null);
+    await database.ref("/books").set(null);
   });
 
   describe("book", () => {
@@ -78,7 +78,7 @@ describe("Ledger", () => {
       });
     });
 
-    it("get transaction", async () => {
+    it("get transaction by account", async () => {
       const start = new Date("2022-09-01 00:00").getTime();
       const end = new Date("2022-09-30 00:00").getTime();
       const trx = await getTransaction("test", start, end);
@@ -90,6 +90,58 @@ describe("Ledger", () => {
         "asset"
       );
       expect(expenseTrx.length).toBe(1);
+    });
+  });
+
+  describe("account", () => {
+    it("create account", async () => {
+      const asset = await createAccount("test-account", {
+        id: "asset-bank",
+        name: "Bank",
+        accountType: "ASSET",
+      });
+      const equity = await createAccount("test-account", {
+        id: "equity-opening",
+        name: "Equity",
+        accountType: "EQUITY",
+      });
+
+      expect(asset.id).toBeDefined();
+      expect(equity.id).toBeDefined();
+    });
+
+    it("get account list", async () => {
+      const accs = await getAccounts("test-account");
+      expect(accs.length).toBe(2);
+      expect(accs[0].name).toBe("Bank");
+    });
+
+    it("get account balance", async () => {
+      // Dummy transaction
+      const date = new Date("2022-09-10 09:00:00").getTime();
+      await createTransaction("test-account", {
+        dateEntry: date,
+        datePosting: date,
+        description: "Testing opening balance",
+        entries: [
+          {
+            account: "asset-bank",
+            amount: 1000000,
+            memo: "Opening balance",
+          },
+          {
+            account: "equity-opening",
+            amount: -1000000,
+            memo: "Opening balance",
+          },
+        ],
+      });
+
+      const accs = await getAccountBalance("test-account", date, date);
+      const asset = accs.find((f) => f.id == "asset-bank");
+      const equity = accs.find((f) => f.id == "equity-opening");
+      expect(asset?.balance).toBe(1000000);
+      expect(equity?.balance).toBe(-1000000);
     });
   });
 });

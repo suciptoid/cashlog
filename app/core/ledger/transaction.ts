@@ -1,9 +1,4 @@
-import type {
-  Account,
-  Transaction,
-  TransactionEntry,
-  TransactionRaw,
-} from "./types";
+import type { TransactionEntry, TransactionRaw } from "./types";
 import { database } from "~/lib/firebase.server";
 
 /**
@@ -47,23 +42,6 @@ export const createTransaction = async (
   await trx.set(data);
 };
 
-export const createAccount = async (
-  book: string,
-  account: Omit<Account, "id"> & Partial<Pick<Account, "id">>
-) => {
-  const ref = database.ref(`/books/${book}/accounts`);
-  const trx = ref.push();
-  const id = trx.key;
-
-  const acc = {
-    ...account,
-    id: id,
-  } as Account;
-
-  await trx.set(acc);
-  return acc;
-};
-
 export const getTransaction = async (
   book: string,
   start: number,
@@ -94,44 +72,4 @@ export const getTransaction = async (
   });
 
   return data;
-};
-
-export const getAccounts = async (book: string) => {
-  const ref = database.ref(`/books/${book}/accounts`);
-
-  const snapshots = await ref.get();
-
-  const data: Account[] = [];
-  snapshots.forEach((snap) => {
-    data.push(snap.val());
-  });
-  return data;
-};
-
-export const getAccountTransactions = async (
-  book: string,
-  start: number,
-  end: number,
-  account?: string
-) => {
-  const transactions = await getTransaction(book, start, end);
-  // Flatten transactions entries
-  return transactions.reduce((all, val) => {
-    let entries = val.entries.map((trx) => {
-      return {
-        id: trx.id,
-        account_id: trx.account,
-        amount: trx.amount,
-        dateEntry: val.dateEntry,
-        datePosting: val.datePosting,
-        description: val.description,
-        trx_id: val.id,
-        memo: trx.memo,
-      } as Transaction;
-    });
-    if (account) {
-      entries = entries.filter((f) => f.account_id == account);
-    }
-    return all.concat(entries);
-  }, [] as Transaction[]);
 };
