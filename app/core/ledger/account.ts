@@ -1,12 +1,36 @@
 import { getTransaction } from "./transaction";
 import type { Account, AccountWithBalance, Transaction } from "./types";
+import cuid from "cuid";
 import { database } from "~/lib/firebase.server";
+
+export const rootAccounts: Partial<Account>[] = [
+  {
+    accountType: "ASSET",
+    name: "Asset",
+  },
+  {
+    accountType: "LIABILITY",
+    name: "Liability",
+  },
+  {
+    accountType: "EQUITY",
+    name: "Equity",
+  },
+  {
+    accountType: "INCOME",
+    name: "Income",
+  },
+  {
+    accountType: "EXPENSE",
+    name: "Expense",
+  },
+];
 
 export const createAccount = async (
   book: string,
   account: Omit<Account, "id"> & Partial<Pick<Account, "id">>
 ) => {
-  let id = database.ref().push().key;
+  let id = cuid();
   if (account.id) {
     id = account.id;
   }
@@ -80,4 +104,11 @@ export const getAccountBalance = async (
         }, 0),
     } as AccountWithBalance;
   });
+};
+
+export const createRootAccount = async (book: string) => {
+  for (let x = 0; x < rootAccounts.length; x++) {
+    const acc = rootAccounts[x];
+    await createAccount(book, acc as Account);
+  }
 };

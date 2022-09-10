@@ -8,6 +8,13 @@ export const sessionCookie = createCookie("__session", {
   sameSite: "lax",
 });
 
+// export type UserSession = Awaited<ReturnType<typeof getUser>>;
+export type UserSession = {
+  name: string;
+  picture: string;
+  user_id: string;
+  email: string;
+};
 export const getUser = async (cookie: string) => {
   if (!cookie) return null;
   const session = await auth.verifySessionCookie(cookie);
@@ -16,9 +23,8 @@ export const getUser = async (cookie: string) => {
     picture: session.picture,
     user_id: session.user_id,
     email: session.email,
-  };
+  } as UserSession;
 };
-export type UserSession = Awaited<ReturnType<typeof getUser>>;
 
 export const requireUser = async (req: Request) => {
   try {

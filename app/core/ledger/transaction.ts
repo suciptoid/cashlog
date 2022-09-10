@@ -1,4 +1,5 @@
 import type { TransactionEntry, TransactionRaw } from "./types";
+import cuid from "cuid";
 import { database } from "~/lib/firebase.server";
 
 /**
@@ -10,9 +11,8 @@ export const createTransaction = async (
   book: string,
   transaction: Omit<TransactionRaw, "id">
 ) => {
-  const ref = database.ref(`/books/${book}/transactions`);
-  const trx = ref.push();
-  const id = trx.key;
+  const id = cuid();
+  const ref = database.ref(`/books/${book}/transactions/${id}`);
 
   const data = {
     ...transaction,
@@ -26,7 +26,7 @@ export const createTransaction = async (
   const entries: any = {};
   let total = 0;
   transaction.entries.forEach((entry) => {
-    const id = ref.push().key!;
+    const id = cuid();
     entries[id] = {
       ...entry,
       id,
@@ -39,7 +39,8 @@ export const createTransaction = async (
     throw Error(`Total amount not balance (${total}), should be 0.`);
   }
 
-  await trx.set(data);
+  await ref.set(data);
+  return data;
 };
 
 export const getTransaction = async (
