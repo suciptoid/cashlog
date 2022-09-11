@@ -8,7 +8,6 @@ import { createBook, deleteBook } from "./book";
 import { createTransaction, getTransaction } from "./transaction";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import rules from "~/database-rules.json";
-import { database } from "~/lib/firebase.server";
 
 describe("Ledger", () => {
   beforeAll(async () => {
@@ -42,11 +41,11 @@ describe("Ledger", () => {
   });
 
   afterAll(async () => {
-    await database.ref("/books").set(null);
+    // await database.ref("/books").set(null);
   });
 
   describe("book", () => {
-    beforeAll(() => {
+    afterAll(() => {
       deleteBook("hello");
     });
     it("create book", async () => {
@@ -60,6 +59,9 @@ describe("Ledger", () => {
   });
 
   describe("transaction", () => {
+    afterAll(() => {
+      deleteBook("test");
+    });
     it("create transaction", async () => {
       await createTransaction("test", {
         dateEntry: new Date("2022-09-01 09:00").getTime(),
@@ -94,6 +96,9 @@ describe("Ledger", () => {
   });
 
   describe("account", () => {
+    afterAll(() => {
+      deleteBook("test-account");
+    });
     it("create account", async () => {
       const asset = await createAccount("test-account", {
         id: "asset-bank",

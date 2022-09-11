@@ -1,4 +1,4 @@
-import type { TransactionEntry, TransactionRaw } from "./types";
+import type { Transaction, TransactionEntry, TransactionRaw } from "./types";
 import cuid from "cuid";
 import { database } from "~/lib/firebase.server";
 
@@ -73,4 +73,22 @@ export const getTransaction = async (
   });
 
   return data;
+};
+
+export const getTransactionEntry = (transactions: TransactionRaw[]) => {
+  return transactions.reduce((all, val) => {
+    let entries = val.entries.map((trx) => {
+      return {
+        id: trx.id,
+        account_id: trx.account,
+        amount: trx.amount,
+        dateEntry: val.dateEntry,
+        datePosting: val.datePosting,
+        description: val.description,
+        trx_id: val.id,
+        memo: trx.memo,
+      } as Transaction;
+    });
+    return all.concat(entries);
+  }, [] as Transaction[]);
 };
