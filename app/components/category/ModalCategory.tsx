@@ -1,6 +1,6 @@
 import CategoryPicker from "../transaction/CategoryPicker";
 import { Dialog, Switch, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Form, useMatches, useTransition } from "@remix-run/react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { CategoryEntity } from "~/models/category";
@@ -79,7 +79,7 @@ export default function Modalcategory({ onClose, category, onDelete }: Props) {
                 >
                   <h3>{category ? "Edit Category" : "Add Category"}</h3>
                   <button onClick={onClose}>
-                    <XIcon className="w-6 h-6 text-gray-400 rounded " />
+                    <XMarkIcon className="w-6 h-6 text-gray-400 rounded " />
                   </button>
                 </Dialog.Title>
                 <Form

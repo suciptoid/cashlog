@@ -1,5 +1,5 @@
 import { Combobox, Transition } from "@headlessui/react";
-import { SelectorIcon } from "@heroicons/react/solid";
+import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import type { Currency } from "~/lib/currency";
 import { currencies } from "~/lib/currency";
@@ -57,7 +57,7 @@ export default function CurrencyPicker({ selectedCode }: Props) {
               onChange={(event) => setQuery(event.target.value)}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <SelectorIcon
+              <ChevronUpDownIcon
                 className="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />

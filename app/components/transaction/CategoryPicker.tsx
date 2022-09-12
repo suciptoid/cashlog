@@ -1,5 +1,5 @@
 import { Listbox, Transition } from "@headlessui/react";
-import { SelectorIcon } from "@heroicons/react/solid";
+import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { useFetcher } from "@remix-run/react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { CategoryEntity } from "~/models/category";
@@ -75,7 +75,7 @@ export default function CategoryPicker(props: Props) {
               </span>
             )}
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <SelectorIcon
+              <ChevronUpDownIcon
                 className="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />

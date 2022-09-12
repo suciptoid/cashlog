@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Form, useTransition } from "@remix-run/react";
 import { Fragment } from "react";
 import CurrencyPicker from "~/components/CurrencyPicker";
@@ -46,7 +46,7 @@ export function ModalAccount({ onClose, onDelete, account }: Props) {
                 >
                   <h3>{account ? "Account Detail" : "Create Account"}</h3>
                   <button onClick={onClose}>
-                    <XIcon className="w-6 h-6 text-gray-400 rounded " />
+                    <XMarkIcon className="w-6 h-6 text-gray-400 rounded " />
                   </button>
                 </Dialog.Title>
                 <div className="mt-2">

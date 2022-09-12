@@ -2,14 +2,14 @@ import { Dialog, Transition } from "@headlessui/react";
 import {
   CalendarIcon,
   ChevronDoubleDownIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useNavigate, useTransition } from "@remix-run/react";
 import dayjs from "dayjs";
-import { Fragment, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { Fragment, useRef, useState } from "react";
 import Calendar from "~/components/Calendar";
 import AccountPicker from "~/components/transaction/AccountPicker";
 import { useOnClickOutside } from "~/hooks/useOutsideClick";
@@ -152,7 +152,7 @@ export default function TransferPage() {
                       navigate(-1);
                     }}
                   >
-                    <XIcon className="h-6 w-6 rounded text-gray-400 " />
+                    <XMarkIcon className="h-6 w-6 rounded text-gray-400 " />
                   </button>
                 </Dialog.Title>
 

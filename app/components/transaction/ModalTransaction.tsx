@@ -2,8 +2,8 @@ import Calendar from "../Calendar";
 import AccountPicker from "./AccountPicker";
 import CategoryPicker from "./CategoryPicker";
 import { Dialog, Transition } from "@headlessui/react";
-import { ChevronDoubleRightIcon, XIcon } from "@heroicons/react/outline";
-import { CalendarIcon } from "@heroicons/react/solid";
+import { ChevronDoubleRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Form, useTransition } from "@remix-run/react";
 import type { ChangeEvent } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -84,7 +84,7 @@ export default function ModalTransaction({ onClose, transaction }: Props) {
                     {transaction ? "Edit Transaction" : "Add Transaction"}
                   </h3>
                   <button onClick={onClose}>
-                    <XIcon className="w-6 h-6 text-gray-400 rounded " />
+                    <XMarkIcon className="w-6 h-6 text-gray-400 rounded " />
                   </button>
                 </Dialog.Title>
 

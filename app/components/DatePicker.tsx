@@ -1,5 +1,5 @@
 import Calendar from "./Calendar";
-import { CalendarIcon, ChevronDownIcon } from "@heroicons/react/outline";
+import { CalendarIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "~/hooks/useOutsideClick";
 import dayjs from "~/lib/dayjs";

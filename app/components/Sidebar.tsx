@@ -2,10 +2,10 @@ import { NavLink } from "./NavLink";
 import UserMenu from "./UserMenu";
 import {
   ChartPieIcon,
-  CollectionIcon,
   CreditCardIcon,
   FolderOpenIcon,
-} from "@heroicons/react/outline";
+  QueueListIcon,
+} from "@heroicons/react/24/outline";
 import { Link, useLocation } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import type { UserSession } from "~/lib/cookies";
@@ -93,7 +93,7 @@ export default function Sidebar({ user }: { user: UserSession }) {
             to="/dashboard/transaction"
             active={pathname === "/dashboard/transaction"}
           >
-            <CollectionIcon className="mr-2 h-4 w-4" />
+            <QueueListIcon className="mr-2 h-4 w-4" />
             Transactions
           </NavLink>
 

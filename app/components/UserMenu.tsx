@@ -1,4 +1,7 @@
-import { LogoutIcon, UserIcon } from "@heroicons/react/outline";
+import {
+  ArrowRightOnRectangleIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { useCallback, useRef, useState } from "react";
 import { useOnClickOutside } from "~/hooks/useOutsideClick";
@@ -54,7 +57,7 @@ export default function UserMenu() {
             onClick={onLogout}
             className="group my-1 flex w-full items-center px-3 py-2 text-left hover:bg-slate-100"
           >
-            <LogoutIcon className="mr-4 ml-2 h-4 w-4 text-gray-600 group-hover:text-gray-900" />
+            <ArrowRightOnRectangleIcon className="mr-4 ml-2 h-4 w-4 text-gray-600 group-hover:text-gray-900" />
             Logout
           </button>
         </div>
