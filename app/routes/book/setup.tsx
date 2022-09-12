@@ -50,5 +50,5 @@ export const action = async ({ request }: ActionArgs) => {
 
   // Create root account
   await createRootAccount(book.id);
-  return redirect(`/book/${book.id}/accounts`);
+  return redirect(`/book/${book.id}/`);
 };

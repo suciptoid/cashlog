@@ -1,4 +1,5 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { getAccounts } from "~/core/ledger/account";
@@ -17,9 +18,10 @@ export default function EntryPage() {
       amount: 0,
     },
   ]);
+
   return (
     <div id="form-entry">
-      <Form method="post">
+      <Form method="post" replace>
         <fieldset>
           <label htmlFor="description">Description</label>
           <input
@@ -42,6 +44,12 @@ export default function EntryPage() {
             <input type="number" name={`amount`} placeholder="Amount" />
           </fieldset>
         ))}
+        <button
+          type="button"
+          onClick={() => setEntries([...entries, { account: "", amount: 0 }])}
+        >
+          Add More
+        </button>
         <fieldset>
           <button
             type="submit"
@@ -62,7 +70,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 export const action = async ({ request, params }: ActionArgs) => {
   const form = await request.formData();
-  const data = Object.fromEntries(form.entries());
+  // const data = Object.fromEntries(form.entries());
 
   const memos = form.getAll("memo");
   const amounts = form.getAll("amount");
@@ -81,5 +89,10 @@ export const action = async ({ request, params }: ActionArgs) => {
     entries,
   });
 
-  return data;
+  // return redirect("./");
+  const referer = request.headers.get("Referer");
+  const search = new URL(request.url);
+  console.log("search param", search.searchParams.get("redirect"), search);
+  return redirect(search.searchParams.get("redirect") || referer || "/book");
+  // return data;
 };

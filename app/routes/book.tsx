@@ -4,6 +4,7 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import Sidebar from "~/components/Sidebar";
 import { getBook, getUserBookkeeping } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
+import dayjs from "~/lib/dayjs";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const user = await requireUser(request);
@@ -20,7 +21,9 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       throw redirect("/book/setup");
     } else if (books.length == 1) {
       console.log("first book", books);
-      throw redirect(`/book/${books[0].id}/accounts`);
+      throw redirect(
+        `/book/${books[0].id}/${dayjs().format("YYYY-MM")}/accounts`
+      );
     }
   } else {
     const book = await getBook(params.book!);
