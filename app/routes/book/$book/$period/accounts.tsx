@@ -23,9 +23,15 @@ export default function AccountPage() {
 
   return (
     <div>
-      <h1 className="px-3 py-2 font-semibold text-gray-800">
-        Accounts Balance
-      </h1>
+      <div className="flex items-center justify-between py-2 px-3">
+        <h1 className="font-semibold text-gray-800">Accounts Balance</h1>
+        <Link
+          to="./../../account/add"
+          className="px-3 py-1 bg-teal-500 rounded text-white"
+        >
+          Add Account
+        </Link>
+      </div>
       <div id="table-accounts" className="px-3 py-2">
         <div className="table w-full">
           <div className="table-header-group">
