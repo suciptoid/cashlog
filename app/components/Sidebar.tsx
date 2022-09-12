@@ -119,6 +119,13 @@ export default function Sidebar({ user }: { user: UserSession }) {
             <ChartPieIcon className="mr-2 h-4 w-4" />
             Budget
           </NavLink>
+          {/* <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
+            Accounting
+          </h2>
+          <NavLink to="/book" active={pathname === "/book"}>
+            <BookOpenIcon className="mr-2 h-4 w-4" />
+            Book
+          </NavLink> */}
           <div className="flex-grow" />
         </div>
         <div className="w-full border-t px-3 py-2">

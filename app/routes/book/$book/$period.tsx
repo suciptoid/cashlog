@@ -20,7 +20,7 @@ export default function RangePage() {
             to={`./../entry?redirect=${location.pathname}`}
             className="bg-teal-500 text-white rounded px-3 py-2 text-sm"
           >
-            New Entry
+            New Journal Entry
           </Link>
         </div>
       </PageHeader>

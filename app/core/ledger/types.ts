@@ -21,11 +21,18 @@ export type Account = {
   id: string;
   name: string;
   code?: string;
+  description?: string;
+  parentId?: string;
+  // comodity_id: string; // commodity can be currency, stocks, mutual funds, etc
   accountType: AccountType;
 };
 
 export type AccountWithBalance = Account & {
   balance: number;
+};
+
+export type AccountTree = AccountWithBalance & {
+  subAccounts: AccountTree[];
 };
 
 export type TransactionEntry = {
@@ -35,7 +42,7 @@ export type TransactionEntry = {
   memo?: string;
 };
 
-export type TransactionRaw = {
+export type Transaction = {
   id: string;
   description: string;
   datePosting: number;
@@ -43,7 +50,7 @@ export type TransactionRaw = {
   entries: TransactionEntry[];
 };
 
-export type Transaction = {
+export type TransactionSingle = {
   id: string;
   trx_id: string;
   account_id: string;
@@ -54,6 +61,6 @@ export type Transaction = {
   dateEntry: number;
 };
 
-export type TransactionWithAccount = Transaction & {
+export type TransactionWithAccount = TransactionSingle & {
   account: Account;
 };

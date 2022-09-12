@@ -1,5 +1,10 @@
 import { getTransaction, getTransactionEntry } from "./transaction";
-import type { Account, AccountWithBalance, Transaction } from "./types";
+import type {
+  Account,
+  AccountTree,
+  AccountWithBalance,
+  TransactionSingle,
+} from "./types";
 import cuid from "cuid";
 import { database } from "~/lib/firebase.server";
 
@@ -94,7 +99,7 @@ export const createRootAccount = async (book: string) => {
 
 export const calculateAccountBalance = (
   accounts: Account[],
-  transactions: Transaction[]
+  transactions: TransactionSingle[]
 ) => {
   return accounts.map((acc) => {
     return {
@@ -106,4 +111,35 @@ export const calculateAccountBalance = (
         }, 0),
     } as AccountWithBalance;
   });
+};
+
+export const buildAccountTree = (
+  accounts: AccountWithBalance[],
+  parent?: string
+) => {
+  const trees = accounts
+    .filter((f) => f.parentId == parent)
+    .map((acc) => {
+      const tree: AccountTree = {
+        ...acc,
+        subAccounts: buildAccountTree(accounts, acc.id),
+      } as AccountTree;
+      return tree;
+    })
+    .map((tree) => {
+      tree.balance = tree.balance + getSubBalance(tree.subAccounts);
+      return tree;
+    });
+  return trees;
+};
+
+export const getSubBalance = (accounts: AccountTree[]) => {
+  const bal: number = accounts.reduce((balance, acc) => {
+    if (acc.subAccounts.length > 0) {
+      return balance + acc.balance; //+ getSubBalance(acc.subAccounts);
+    }
+    return balance + acc.balance;
+  }, 0);
+
+  return bal;
 };

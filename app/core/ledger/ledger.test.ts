@@ -1,4 +1,5 @@
 import {
+  buildAccountTree,
   createAccount,
   getAccountBalance,
   getAccounts,
@@ -6,6 +7,7 @@ import {
 } from "./account";
 import { createBook, deleteBook } from "./book";
 import { createTransaction, getTransaction } from "./transaction";
+import type { AccountWithBalance } from "./types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import rules from "~/database-rules.json";
 
@@ -147,6 +149,58 @@ describe("Ledger", () => {
       const equity = accs.find((f) => f.id == "equity-opening");
       expect(asset?.balance).toBe(1000000);
       expect(equity?.balance).toBe(-1000000);
+    });
+
+    describe("account-tree", () => {
+      const bookId = "test-account-tree";
+      afterAll(() => {
+        deleteBook(bookId);
+      });
+      it("create nested account", async () => {
+        const root = await createAccount(bookId, {
+          accountType: "ASSET",
+          name: "Assets",
+          code: "1000",
+        });
+        const current = await createAccount(bookId, {
+          accountType: "ASSET",
+          name: "Current Assets",
+          code: "1100",
+          parentId: root.id,
+        });
+        await createAccount(bookId, {
+          accountType: "ASSET",
+          name: "Non Current Assets",
+          code: "1200",
+          parentId: root.id,
+        });
+
+        await createAccount(bookId, {
+          accountType: "ASSET",
+          name: "Checking",
+          code: "1101",
+          parentId: current.id,
+        });
+        await createAccount(bookId, {
+          accountType: "ASSET",
+          name: "Saving",
+          code: "1102",
+          parentId: current.id,
+        });
+
+        const accounts = await getAccountBalance(
+          bookId,
+          Date.now(),
+          Date.now()
+        );
+        expect(accounts.length).toBe(5);
+
+        const tree = buildAccountTree(accounts as AccountWithBalance[]);
+        expect(tree.length).toBe(1); // Asset
+        expect(tree[0].subAccounts.length).toBe(2); // Asset:[Current Asset,Non Current Asset]
+        expect(tree[0].subAccounts[0].subAccounts.length).toBe(2);
+        // console.log(JSON.stringify(tree, null, 2));
+      });
     });
   });
 });

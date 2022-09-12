@@ -1,4 +1,4 @@
-import type { Transaction, TransactionEntry, TransactionRaw } from "./types";
+import type { Transaction, TransactionEntry, TransactionSingle } from "./types";
 import cuid from "cuid";
 import { database } from "~/lib/firebase.server";
 
@@ -9,7 +9,7 @@ import { database } from "~/lib/firebase.server";
  */
 export const createTransaction = async (
   book: string,
-  transaction: Omit<TransactionRaw, "id">
+  transaction: Omit<Transaction, "id">
 ) => {
   const id = cuid();
   const ref = database.ref(`/books/${book}/transactions/${id}`);
@@ -17,7 +17,7 @@ export const createTransaction = async (
   const data = {
     ...transaction,
     id: id,
-  } as TransactionRaw;
+  } as Transaction;
 
   if (transaction.entries.length < 2) {
     throw Error("Transaction at least have 2 entries");
@@ -56,12 +56,12 @@ export const getTransaction = async (
     .endAt(end)
     .get();
 
-  const data: TransactionRaw[] = [];
+  const data: Transaction[] = [];
 
   // Map snapshot into collection
   snapshots.forEach((snap) => {
     const raw = snap.val();
-    const trx: TransactionRaw = raw;
+    const trx: Transaction = raw;
 
     // Map Entries
     const entries: TransactionEntry[] = [];
@@ -75,7 +75,7 @@ export const getTransaction = async (
   return data;
 };
 
-export const getTransactionEntry = (transactions: TransactionRaw[]) => {
+export const getTransactionEntry = (transactions: Transaction[]) => {
   return transactions.reduce((all, val) => {
     let entries = val.entries.map((trx) => {
       return {
@@ -87,8 +87,8 @@ export const getTransactionEntry = (transactions: TransactionRaw[]) => {
         description: val.description,
         trx_id: val.id,
         memo: trx.memo,
-      } as Transaction;
+      } as TransactionSingle;
     });
     return all.concat(entries);
-  }, [] as Transaction[]);
+  }, [] as TransactionSingle[]);
 };

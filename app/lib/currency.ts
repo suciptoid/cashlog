@@ -1,4 +1,5 @@
 // https://gist.github.com/Fluidbyte/2973986
+// TODO: update to https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list_one.xml
 
 export interface Currency {
   code: string;
