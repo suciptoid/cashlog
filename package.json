@@ -19,7 +19,7 @@
     "emulator:export": "firebase emulators:export .firebase/emulator -f"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.0",
+    "@headlessui/react": "^1.7.1",
     "@heroicons/react": "^2.0.10",
     "@remix-run/express": "^1.7.0",
     "@remix-run/node": "^1.7.0",
