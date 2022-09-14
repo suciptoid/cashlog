@@ -14,7 +14,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       currentMonth.format("YYYY-MM")
     );
     throw redirect(
-      `./book/${params.book}/${currentMonth.format("YYYY-MM")}/accounts`
+      `/book/${params.book}/${currentMonth.format("YYYY-MM")}/accounts`
     );
   }
   return null;

@@ -21,6 +21,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.1",
     "@heroicons/react": "^2.0.11",
+    "@radix-ui/react-dialog": "^1.0.0",
     "@remix-run/express": "^1.7.0",
     "@remix-run/node": "^1.7.0",
     "@remix-run/react": "^1.7.0",
