@@ -125,7 +125,7 @@ export default function Sidebar({ user }: { user: UserSession }) {
           </h2>
           <NavLink to="/book" active={pathname === "/book"}>
             <BookOpenIcon className="mr-2 h-4 w-4" />
-            Book
+            Bookkeeping
           </NavLink>
           <div className="flex-grow" />
         </div>

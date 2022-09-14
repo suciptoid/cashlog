@@ -8,7 +8,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   // Set current period
   if (!period) {
     const currentMonth = dayjs();
-    throw redirect(`./${currentMonth.format("YYYY-MM")}/accounts`);
+    console.log(
+      "redirect to curent period",
+      period,
+      currentMonth.format("YYYY-MM")
+    );
+    throw redirect(
+      `./book/${params.book}/${currentMonth.format("YYYY-MM")}/accounts`
+    );
   }
   return null;
 };

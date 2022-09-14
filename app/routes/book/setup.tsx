@@ -48,6 +48,8 @@ export const action = async ({ request }: ActionArgs) => {
     form.get("name")!.toString()
   );
 
+  console.log("setup book", book);
+
   // Create root account
   await createRootAccount(book.id);
   return redirect(`/book/${book.id}/`);
