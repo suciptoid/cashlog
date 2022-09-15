@@ -22,8 +22,8 @@ export default function AccountPage() {
   }, [data]);
 
   return (
-    <div>
-      <div className="flex items-center justify-between py-2 px-3">
+    <div className="px-8">
+      <div className="flex items-center justify-between py-2">
         <h1 className="font-semibold text-gray-800">Accounts Balance</h1>
         <Link
           to="./../../account/add"
@@ -32,7 +32,7 @@ export default function AccountPage() {
           Add Account
         </Link>
       </div>
-      <div id="table-accounts" className="px-3 py-2">
+      <div id="table-accounts" className="py-2">
         <div className="table w-full">
           <div className="table-header-group">
             <div className="table-row">
