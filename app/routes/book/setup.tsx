@@ -1,8 +1,8 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { createRootAccount } from "~/core/ledger/account";
-import { createUserBookkeeping } from "~/core/ledger/book";
+import { Book, BookInfoSchema } from "~/core/ledger";
+import { AccountType } from "~/core/ledger/account";
 import { requireUser } from "~/lib/cookies";
 
 export default function BookSetupPage() {
@@ -43,12 +43,32 @@ export default function BookSetupPage() {
 export const action = async ({ request }: ActionArgs) => {
   const user = await requireUser(request);
   const form = await request.formData();
-  const book = await createUserBookkeeping(
-    user.user_id,
-    form.get("name")!.toString()
+  const book = await Book.create(
+    BookInfoSchema.omit({ id: true, timestamp: true }).parse(
+      Object.fromEntries(form.entries())
+    )
   );
 
+  const asset = await book.createAccount({
+    name: "Asset",
+    type: AccountType.Asset,
+  });
+
+  await book.createAccount({
+    name: "Bank",
+    type: AccountType.Asset,
+    parent: asset.id,
+  });
+
+  await book.createAccount({
+    name: "Belanja",
+    type: AccountType.Expense,
+  });
+
+  console.log("setup book", book);
+  await book.addUser(user.user_id);
+
   // Create root account
-  await createRootAccount(book.id);
+  // await createRootAccount(book.id);
   return redirect(`/book/${book.id}/`);
 };

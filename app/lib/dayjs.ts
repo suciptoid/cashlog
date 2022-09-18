@@ -15,4 +15,4 @@ dayjs.extend(timezone);
 dayjs.extend(customParse);
 
 export default dayjs;
-export { dayjs };
+export { dayjs, dayjs as day };

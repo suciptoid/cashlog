@@ -33,7 +33,7 @@ export default function UserMenu() {
           <div className="mr-2 flex items-center rounded-full">
             <img
               alt="profile"
-              className="mr-2 rounded-full"
+              className="mr-2 rounded-full aspect-square"
               width={30}
               height={30}
               src={user.picture}

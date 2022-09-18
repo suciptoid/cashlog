@@ -4,9 +4,9 @@
     ".write": false,
     "books": {
       "$book_id": {
-        "transactions": {
+        "journals": {
           ".indexOn": [
-            "datePosting"
+            "date"
           ]
         }
       }

@@ -2,7 +2,8 @@ import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import Sidebar from "~/components/Sidebar";
-import { getBook, getUserBookkeeping } from "~/core/ledger/book";
+import { Book } from "~/core/ledger";
+import { getBook } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
 import dayjs from "~/lib/dayjs";
 
@@ -13,7 +14,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   }
 
   if (!params.book) {
-    const books = await getUserBookkeeping(user.user_id);
+    const books = await Book.getUserBook(user.user_id);
     const url = new URL(request.url);
 
     if (books.length == 0 && url.pathname != "/book/setup") {
