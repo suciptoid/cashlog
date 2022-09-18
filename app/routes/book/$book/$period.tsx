@@ -11,7 +11,7 @@ import {
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
-import { Book } from "~/core/ledger";
+import { Book } from "~/core/ledger/book";
 import type { TransactionEntry } from "~/core/ledger/types";
 import dayjs from "~/lib/dayjs";
 

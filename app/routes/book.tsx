@@ -2,7 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import Sidebar from "~/components/Sidebar";
-import { Book } from "~/core/ledger";
+import { Book } from "~/core/ledger/book";
 import { BookNotExists } from "~/core/ledger/errors";
 import { requireUser } from "~/lib/cookies";
 import dayjs from "~/lib/dayjs";

@@ -7,7 +7,7 @@ import { useState } from "react";
 // import { getAccounts } from "~/core/ledger/account";
 import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
-import { Book } from "~/core/ledger";
+import { Book } from "~/core/ledger/book";
 import type { TransactionEntry } from "~/core/ledger/types";
 
 export default function EntryPage() {

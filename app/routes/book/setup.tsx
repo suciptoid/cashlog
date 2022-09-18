@@ -1,8 +1,8 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { Book, BookInfoSchema } from "~/core/ledger";
 import { AccountType } from "~/core/ledger/account";
+import { Book, BookInfoSchema } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
 
 export default function BookSetupPage() {
@@ -60,9 +60,18 @@ export const action = async ({ request }: ActionArgs) => {
     parent: asset.id,
   });
 
+  const expense = await book.createAccount({
+    name: "Expenses",
+    type: AccountType.Expense,
+  });
   await book.createAccount({
     name: "Belanja",
     type: AccountType.Expense,
+    parent: expense.id,
+  });
+  await book.createAccount({
+    name: "Equity",
+    type: AccountType.Equity,
   });
 
   console.log("setup book", book);

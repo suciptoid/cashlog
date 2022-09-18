@@ -4,8 +4,8 @@ import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import qs from "qs";
 import { z } from "zod";
-import { Book } from "~/core/ledger";
 import { AccountType } from "~/core/ledger/account";
+import { Book } from "~/core/ledger/book";
 
 // import { createAccount, getAccounts } from "~/core/ledger/account";
 

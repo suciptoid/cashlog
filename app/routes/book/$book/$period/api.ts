@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Book } from "~/core/ledger";
+import { Book } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
 
 export const loader = async ({ request, params }: LoaderArgs) => {

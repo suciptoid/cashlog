@@ -1,4 +1,4 @@
-import { Book } from ".";
+import { Book } from "./book";
 import {
   afterAll,
   afterEach,
