@@ -1,34 +1,21 @@
-import type { loader as periodLoader } from "../$period";
-import { Link, useMatches } from "@remix-run/react";
+import { useBookData } from "../$period";
+import { Link } from "@remix-run/react";
 import { useMemo } from "react";
-import {
-  buildAccountTree,
-  calculateAccountBalance,
-} from "~/core/ledger/account";
-import { getTransactionEntry } from "~/core/ledger/transaction";
-import type { AccountTree } from "~/core/ledger/types";
+import type { AccountTree } from "~/core/ledger/account";
+import { Account } from "~/core/ledger/account";
 
 export default function AccountPage() {
-  const matches = useMatches();
-  const data = useMemo(() => {
-    const period = matches.find((f) => f.id == "routes/book/$book/$period");
-    return period?.data as Awaited<ReturnType<typeof periodLoader>>;
-  }, [matches]);
+  const { accounts } = useBookData();
 
-  const accounts = useMemo(() => {
-    const trxs = getTransactionEntry(data.transactions);
-    const accounts = calculateAccountBalance(data.accounts, trxs);
-    return buildAccountTree(accounts);
-  }, [data]);
+  const tree = useMemo(() => {
+    return Account.toTree(accounts);
+  }, [accounts]);
 
   return (
     <div className="px-8">
       <div className="flex items-center justify-between py-2">
         <h1 className="font-semibold text-gray-800">Accounts Balance</h1>
-        <Link
-          to="./../../account/add"
-          className="px-3 py-1 bg-teal-500 rounded text-white"
-        >
+        <Link to="./add" className="px-3 py-1 bg-teal-500 rounded text-white">
           Add Account
         </Link>
       </div>
@@ -41,21 +28,12 @@ export default function AccountPage() {
             </div>
           </div>
           <div className="table-row-group">
-            {accounts.map((acc) => (
+            {tree.map((acc) => (
               <AccountRow account={acc} key={acc.id} />
-              // <div key={acc.id} className="table-row">
-              //   <div className="table-cell py-2 border-b">
-              //     <Link to={`./${acc.id}`}>{acc.name}</Link>
-              //   </div>
-              //   <div className="table-cell text-end border-b">
-              //     {acc.balance.toLocaleString()}
-              //   </div>
-              // </div>
             ))}
           </div>
         </div>
       </div>
-      {/* <code>{JSON.stringify(accountBalance)}</code> */}
     </div>
   );
 }
@@ -83,11 +61,11 @@ function AccountRow({ account, depth = 0 }: AccountRowProps) {
           {account.balance.toLocaleString()}
         </div>
       </div>
-      {account.subAccounts?.map((subAcc) => (
+      {account.childrens.map((child) => (
         <AccountRow
-          key={`${account.id}-sub-${subAcc.id}`}
+          key={`${account.id}-sub-${child.id}`}
           depth={depth + 1}
-          account={subAcc}
+          account={child}
         />
       ))}
     </>

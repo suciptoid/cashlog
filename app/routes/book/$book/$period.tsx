@@ -4,31 +4,29 @@ import {
   Link,
   Outlet,
   useFetcher,
-  useLoaderData,
   useLocation,
   useMatches,
   useParams,
 } from "@remix-run/react";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
-import { getAccounts } from "~/core/ledger/account";
-import { getTransaction } from "~/core/ledger/transaction";
+import { Book } from "~/core/ledger";
 import type { TransactionEntry } from "~/core/ledger/types";
 import dayjs from "~/lib/dayjs";
 
 export default function RangePage() {
-  const { period } = useLoaderData<typeof loader>();
   const location = useLocation();
   return (
     <div>
       <PageHeader>
         <div className="flex items-center h-full px-8">
           <h1 className=" font-bold text-gray-800">
-            {dayjs(period).format("YYYY MMMM")}
+            {dayjs().format("YYYY MMMM")}
           </h1>
           <div className="flex-1"></div>
           <Link
-            to={`./../entry?redirect=${location.pathname}`}
+            to={`./entry?redirect=${location.pathname}`}
             className="bg-teal-500 text-white rounded px-3 py-2 text-sm"
           >
             New Journal Entry
@@ -41,24 +39,16 @@ export default function RangePage() {
   );
 }
 
+export const BookParams = z.object({
+  book: z.string().min(10),
+});
+
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const period = dayjs(params.period, "YYYY-MM");
-  const book = params.book!;
-  const range = {
-    start: period.startOf("month").valueOf(),
-    end: period.endOf("month").valueOf(),
-  };
-  const transactions = await getTransaction(book, range.start, range.end);
-  const accounts = await getAccounts(book);
+  const p = BookParams.parse(params);
+  const book = Book.withId(p.book);
+  await book.loadAll();
 
-  // console.log(range, transactions);
-
-  return {
-    range,
-    transactions,
-    period,
-    accounts,
-  };
+  return book;
 };
 
 export function useBookData() {
@@ -142,7 +132,7 @@ export function JournalEntryDialog() {
                     updateEntries(idx, { account: e.target.value })
                   }
                 >
-                  {accounts.map((acc) => (
+                  {accounts?.map((acc) => (
                     <option key={acc.id} value={acc.id}>
                       {acc.name}
                     </option>

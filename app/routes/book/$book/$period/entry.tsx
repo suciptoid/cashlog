@@ -1,14 +1,18 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { useBookData } from "../$period";
+import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
+import qs from "qs";
 import { useState } from "react";
+// import { getAccounts } from "~/core/ledger/account";
+import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
-import { getAccounts } from "~/core/ledger/account";
-import { createTransaction } from "~/core/ledger/transaction";
+import { Book } from "~/core/ledger";
 import type { TransactionEntry } from "~/core/ledger/types";
 
 export default function EntryPage() {
-  const { accounts } = useLoaderData<typeof loader>();
+  // const { accounts } = useLoaderData<typeof loader>();
+  const { accounts } = useBookData();
   const [entries, setEntries] = useState<TransactionEntry[]>([
     {
       account: "",
@@ -64,7 +68,7 @@ export default function EntryPage() {
             className="px-3 py-2 border my-1 flex items-center"
           >
             <select
-              name="account"
+              name={`entries[${idx}][account]`}
               defaultValue={m.account}
               onChange={(e) => updateEntries(idx, { account: e.target.value })}
             >
@@ -76,7 +80,7 @@ export default function EntryPage() {
             </select>
             <input
               type="text"
-              name={`memo`}
+              name={`entries[${idx}][description]`}
               className="flex-1"
               placeholder="Memo"
               defaultValue={m.memo}
@@ -88,7 +92,7 @@ export default function EntryPage() {
               onChange={(e) =>
                 updateEntries(idx, { amount: Number(e.target.value) })
               }
-              name={`amount`}
+              name={`entries[${idx}][amount]`}
               placeholder="Amount"
             />
           </fieldset>
@@ -113,36 +117,36 @@ export default function EntryPage() {
   );
 }
 
-export const loader = async ({ request, params }: LoaderArgs) => {
-  const accounts = await getAccounts(params.book!);
-  return { accounts };
-};
+// export const loader = async ({ request, params }: LoaderArgs) => {
+//   const accounts = await getAccounts(params.book!);
+//   return { accounts };
+// };
+
+const EntryDTO = z.object({
+  description: z.string().optional(),
+  date: z.number().default(Date.now()),
+  entries: z
+    .array(
+      z.object({
+        amount: z
+          .string()
+          .transform((v) => Number(v))
+          .default("0"),
+        description: z.string().optional(),
+        account: z.string().min(10),
+      })
+    )
+    .min(2),
+});
 
 export const action = async ({ request, params }: ActionArgs) => {
-  const form = await request.formData();
-  // const data = Object.fromEntries(form.entries());
+  const plainData = await request.text();
+  const data = EntryDTO.parse(qs.parse(plainData));
 
-  const memos = form.getAll("memo");
-  const amounts = form.getAll("amount");
-  const entries = form.getAll("account").map((acc, idx) => {
-    return {
-      account: acc.toString(),
-      amount: parseInt(amounts[idx].toString()),
-      memo: memos[idx].toString(),
-    } as TransactionEntry;
-  });
-
-  await createTransaction(params.book!, {
-    dateEntry: Date.now(),
-    datePosting: Date.now(),
-    description: form.get("description")?.toString() || "",
-    entries,
-  });
-
-  // return redirect("./");
+  const book = await Book.withId(params.book!).createJournal(data);
+  console.log("book", book);
   const referer = request.headers.get("Referer");
   const search = new URL(request.url);
   console.log("search param", search.searchParams.get("redirect"), search);
   return redirect(search.searchParams.get("redirect") || referer || "/book");
-  // return data;
 };

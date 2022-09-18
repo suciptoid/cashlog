@@ -1,18 +1,21 @@
+import { Book } from ".";
 import {
-  buildAccountTree,
-  createAccount,
-  getAccountBalance,
-  getAccounts,
-  getAccountTransactions,
-} from "./account";
-import { createBook, deleteBook } from "./book";
-import { createTransaction, getTransaction } from "./transaction";
-import type { AccountWithBalance } from "./types";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 import rules from "~/database-rules.json";
+import { day } from "~/lib/dayjs";
+import { database } from "~/lib/firebase.server";
+import { generateId } from "~/lib/id";
 
-describe("Ledger", () => {
+describe("Ledger Class", () => {
   beforeAll(async () => {
+    // Set rules
     const res = await fetch(
       "http:/127.0.0.1:9999/.settings/rules.json?access_token=123&ns=test",
       {
@@ -20,186 +23,97 @@ describe("Ledger", () => {
         body: JSON.stringify(rules),
       }
     );
-    expect(res.status).toBe(200);
-
-    const asset = await createAccount("test", {
-      id: "asset",
-      name: "Asset",
-      accountType: "ASSET",
-      code: "1-1000",
-    });
-
-    expect(asset.name).toBe("Asset");
-    expect(asset.id).toBeDefined();
-
-    await createAccount("test", {
-      id: "expense",
-      name: "Expense",
-      accountType: "EXPENSE",
-      code: "5-5000",
-    });
-    const accs = await getAccounts("test");
-    expect(accs.length).toEqual(2);
+    expect(res.status).toEqual(200);
   });
 
-  afterAll(async () => {
-    // await database.ref("/books").set(null);
-  });
+  describe("Book", () => {
+    const id = generateId();
+    const ref = database.ref(`/books/${id}/info`);
+    beforeEach(async () => {
+      await ref.set({
+        id: id,
+        timestamp: Date.now(),
+        name: "Book 1",
+      });
+    });
+    afterEach(async () => {
+      await ref.remove();
+    });
 
-  describe("book", () => {
-    afterAll(() => {
-      deleteBook("hello");
-    });
-    it("create book", async () => {
-      const book = await createBook("hello", "Hello Book Keeping");
-      expect(book).toBeDefined();
+    it("Get book from id", async () => {
+      const book = Book.withId(id);
+      expect(book.id).toEqual(id);
+      const info = await book.getBookInfo();
+      expect(info.name).toEqual("Book 1");
     });
 
-    it("create book error on existing id", async () => {
-      expect(createBook("hello", "Hello Book Keeping")).rejects.toThrowError();
-    });
-  });
+    describe("Journal", () => {
+      const id = "journal-" + generateId();
+      afterEach(async () => {
+        await Book.withId(id).delete();
+      });
 
-  describe("transaction", () => {
-    afterAll(() => {
-      deleteBook("test");
-    });
-    it("create transaction", async () => {
-      await createTransaction("test", {
-        dateEntry: new Date("2022-09-01 09:00").getTime(),
-        datePosting: new Date("2022-09-01 09:00").getTime(),
-        description: "test manual journal",
-        entries: [
-          {
-            account: "asset",
-            amount: 100000,
-          },
-          {
-            account: "expense",
-            amount: -100000,
-          },
-        ],
+      it("create journal entry", async () => {
+        const book = Book.withId(id);
+        await book.createJournal({
+          date: day("2022-09-09").valueOf(),
+          description: "Create manual journal entry",
+          entries: [
+            {
+              account: "Expense",
+              amount: 100,
+            },
+            {
+              account: "Asset",
+              amount: -100,
+            },
+          ],
+        });
+
+        const journals = await book.getJournals(day("2022-09-09").valueOf());
+        expect(journals.length).toBe(1);
+        expect(journals[0].entries.length).toEqual(2);
+      });
+
+      it("throw error on unbalance entry", async () => {
+        const book = Book.withId(id);
+        expect(
+          book.createJournal({
+            date: day("2022-09-09").valueOf(),
+            description: "Create unbalance journal entry",
+            entries: [
+              {
+                account: "Expense",
+                amount: 50,
+              },
+              {
+                account: "Asset",
+                amount: -100,
+              },
+            ],
+          })
+        ).rejects.toThrow();
       });
     });
 
-    it("get transaction by account", async () => {
-      const start = new Date("2022-09-01 00:00").getTime();
-      const end = new Date("2022-09-30 00:00").getTime();
-      const trx = await getTransaction("test", start, end);
-      expect(trx.length).toBe(1);
-      const expenseTrx = await getAccountTransactions(
-        "test",
-        start,
-        end,
-        "asset"
-      );
-      expect(expenseTrx.length).toBe(1);
-    });
-  });
-
-  describe("account", () => {
-    afterAll(() => {
-      deleteBook("test-account");
-    });
-    it("create account", async () => {
-      const asset = await createAccount("test-account", {
-        id: "asset-bank",
-        name: "Bank",
-        accountType: "ASSET",
-      });
-      const equity = await createAccount("test-account", {
-        id: "equity-opening",
-        name: "Equity",
-        accountType: "EQUITY",
+    describe("Account", () => {
+      const id = generateId();
+      afterAll(async () => {
+        await Book.withId(id).delete();
       });
 
-      expect(asset.id).toBeDefined();
-      expect(equity.id).toBeDefined();
-    });
+      it("get all accounts", async () => {
+        const book = Book.withId(id);
+        const accId = generateId();
 
-    it("get account list", async () => {
-      const accs = await getAccounts("test-account");
-      expect(accs.length).toBe(2);
-      expect(accs[0].name).toBe("Bank");
-    });
-
-    it("get account balance", async () => {
-      // Dummy transaction
-      const date = new Date("2022-09-10 09:00:00").getTime();
-      await createTransaction("test-account", {
-        dateEntry: date,
-        datePosting: date,
-        description: "Testing opening balance",
-        entries: [
-          {
-            account: "asset-bank",
-            amount: 1000000,
-            memo: "Opening balance",
-          },
-          {
-            account: "equity-opening",
-            amount: -1000000,
-            memo: "Opening balance",
-          },
-        ],
-      });
-
-      const accs = await getAccountBalance("test-account", date, date);
-      const asset = accs.find((f) => f.id == "asset-bank");
-      const equity = accs.find((f) => f.id == "equity-opening");
-      expect(asset?.balance).toBe(1000000);
-      expect(equity?.balance).toBe(-1000000);
-    });
-
-    describe("account-tree", () => {
-      const bookId = "test-account-tree";
-      afterAll(() => {
-        deleteBook(bookId);
-      });
-      it("create nested account", async () => {
-        const root = await createAccount(bookId, {
-          accountType: "ASSET",
-          name: "Assets",
-          code: "1000",
+        expect((await book.getAccounts()).length).toEqual(0);
+        await book.ref.child("accounts").child(accId).set({
+          id: accId,
+          name: "Asset",
+          type: "ASSET",
         });
-        const current = await createAccount(bookId, {
-          accountType: "ASSET",
-          name: "Current Assets",
-          code: "1100",
-          parentId: root.id,
-        });
-        await createAccount(bookId, {
-          accountType: "ASSET",
-          name: "Non Current Assets",
-          code: "1200",
-          parentId: root.id,
-        });
-
-        await createAccount(bookId, {
-          accountType: "ASSET",
-          name: "Checking",
-          code: "1101",
-          parentId: current.id,
-        });
-        await createAccount(bookId, {
-          accountType: "ASSET",
-          name: "Saving",
-          code: "1102",
-          parentId: current.id,
-        });
-
-        const accounts = await getAccountBalance(
-          bookId,
-          Date.now(),
-          Date.now()
-        );
-        expect(accounts.length).toBe(5);
-
-        const tree = buildAccountTree(accounts as AccountWithBalance[]);
-        expect(tree.length).toBe(1); // Asset
-        expect(tree[0].subAccounts.length).toBe(2); // Asset:[Current Asset,Non Current Asset]
-        expect(tree[0].subAccounts[0].subAccounts.length).toBe(2);
-        // console.log(JSON.stringify(tree, null, 2));
+        const accs = await book.getAccounts();
+        expect(accs.length).toEqual(1);
       });
     });
   });

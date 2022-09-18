@@ -1,25 +1,22 @@
-import type { loader as periodLoader } from "../$period";
-import { Link, useMatches, useParams } from "@remix-run/react";
+import { useBookData } from "../$period";
+import { Link, useParams } from "@remix-run/react";
 import dayjs from "dayjs";
 import { useMemo } from "react";
-import { getTransactionEntry } from "~/core/ledger/transaction";
+import { Journal } from "~/core/ledger/journal";
 
 export default function AccountDetailPage() {
-  const matches = useMatches();
+  const { accounts, journals } = useBookData();
   const params = useParams();
-  const data = useMemo(() => {
-    const period = matches.find((f) => f.id == "routes/book/$book/$period");
-    return period?.data as Awaited<ReturnType<typeof periodLoader>>;
-  }, [matches]);
 
   const account = useMemo(() => {
-    return data.accounts.find((f) => f.id == params.id);
-  }, [data.accounts, params.id]);
+    return accounts.find((f) => f.id == params.id);
+  }, [accounts, params.id]);
 
   const transactions = useMemo(() => {
-    const trxs = getTransactionEntry(data.transactions);
-    return trxs.filter((f) => f.account_id == params.id);
-  }, [data.transactions, params.id]);
+    const transactions = Journal.flatten(journals);
+    return transactions.filter((f) => f.account == account?.id);
+  }, [account?.id, journals]);
+
   return (
     <div>
       <h1 className="px-3 py-2 font-semibold text-gray-800">{account?.name}</h1>
@@ -36,10 +33,12 @@ export default function AccountDetailPage() {
             {transactions.map((trx) => (
               <div key={trx.id} className="table-row">
                 <div className="table-cell border-b">
-                  {dayjs(trx.datePosting).format("YYYY-MM-DD")}
+                  {dayjs(trx.date).format("YYYY-MM-DD")}
                 </div>
                 <div className="table-cell py-2 border-b">
-                  <Link to={`./${trx.id}`}>{trx.description}</Link>
+                  <Link to={`./${trx.id}`}>
+                    {trx.description || trx.journal_description}
+                  </Link>
                 </div>
                 <div className="table-cell text-end border-b">
                   {/* {JSON.stringify(trx)} */}
