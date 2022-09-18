@@ -21,19 +21,23 @@ export default function AccountDetailPage() {
     <div>
       <h1 className="px-3 py-2 font-semibold text-gray-800">{account?.name}</h1>
       <div id="table-account-transactions" className="px-3 py-2">
-        <div className="table w-full table-auto">
-          <div className="table-header-group">
-            <div className="table-row">
-              <div className="table-cell">Date</div>
-              <div className="table-cell">Description</div>
-              <div className="table-cell text-end">Amount</div>
+        <div className="table w-full table-auto text-sm">
+          <div className="table-header-group text-gray-800">
+            <div className="table-row text-base">
+              <div className="table-cell border-y py-2 font-medium">Date</div>
+              <div className="table-cell border-y py-2 font-medium">
+                Description
+              </div>
+              <div className="table-cell text-end border-y py-2 font-medium">
+                Amount
+              </div>
             </div>
           </div>
           <div className="table-row-group">
             {transactions.map((trx) => (
               <div key={trx.id} className="table-row">
                 <div className="table-cell border-b">
-                  {dayjs(trx.date).format("YYYY-MM-DD")}
+                  {dayjs(trx.date).format("DD/MM/YYYY")}
                 </div>
                 <div className="table-cell py-2 border-b">
                   <Link to={`./${trx.id}`}>

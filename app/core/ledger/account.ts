@@ -8,16 +8,28 @@ export enum AccountType {
   Income = "INCOME",
 }
 
+export enum AccountSubType {
+  // Assets
+  Bank = "BANK",
+  Cash = "CASH",
+  Receivable = "RECEIVABLE",
+  // Liability
+  CreditCard = "CREDITCARD",
+  Payable = "PAYABLE",
+}
+
 export const AccountSchema = z.object({
   id: z.string().min(10),
   name: z.string(),
   code: z.string().optional(),
   description: z.string().optional(),
+  currency: z.string().default("USD"),
   parent: z
     .string()
     .optional()
     .transform((v) => (v == "" ? null : v)),
   type: z.nativeEnum(AccountType),
+  sub_type: z.nativeEnum(AccountSubType).optional(),
 });
 
 const AccountPartialSchema = AccountSchema.partial();
@@ -51,10 +63,61 @@ export type AccountTree = AccountWithBalance & {
   childrens: AccountTree[];
 };
 
+export const personalTemplate = [
+  {
+    id: "asset",
+    name: "Assets",
+    type: AccountType.Asset,
+    childrens: [
+      {
+        id: "asset-bank",
+        name: "Bank",
+        type: AccountType.Asset,
+        sub_type: AccountSubType.Bank,
+      },
+      {
+        id: "asset-cash",
+        name: "Cash",
+        type: AccountType.Asset,
+        sub_type: AccountSubType.Cash,
+      },
+    ],
+  },
+  {
+    id: "income",
+    name: "Income",
+    type: AccountType.Asset,
+    childrens: [
+      {
+        id: "income-salary",
+        name: "Salary",
+        type: AccountType.Income,
+      },
+    ],
+  },
+  {
+    id: "expense",
+    name: "Expenses",
+    type: AccountType.Expense,
+    childrens: [
+      {
+        id: "expense-grocery",
+        name: "Grocery",
+        type: AccountType.Expense,
+      },
+      {
+        id: "expense-others",
+        name: "Others",
+        type: AccountType.Expense,
+      },
+    ],
+  },
+];
+
 export const accountTemplates = [
   {
     name: "Personal",
-    accounts: {},
+    accounts: personalTemplate,
   },
 ];
 

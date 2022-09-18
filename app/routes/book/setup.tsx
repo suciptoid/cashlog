@@ -1,7 +1,6 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { AccountType } from "~/core/ledger/account";
 import { Book, BookInfoSchema } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
 
@@ -49,32 +48,32 @@ export const action = async ({ request }: ActionArgs) => {
     )
   );
 
-  const asset = await book.createAccount({
-    name: "Asset",
-    type: AccountType.Asset,
-  });
+  // const asset = await book.createAccount({
+  //   name: "Asset",
+  //   type: AccountType.Asset,
+  // });
 
-  await book.createAccount({
-    name: "Bank",
-    type: AccountType.Asset,
-    parent: asset.id,
-  });
+  // await book.createAccount({
+  //   name: "Bank",
+  //   type: AccountType.Asset,
+  //   parent: asset.id,
+  // });
 
-  const expense = await book.createAccount({
-    name: "Expenses",
-    type: AccountType.Expense,
-  });
-  await book.createAccount({
-    name: "Belanja",
-    type: AccountType.Expense,
-    parent: expense.id,
-  });
-  await book.createAccount({
-    name: "Equity",
-    type: AccountType.Equity,
-  });
+  // const expense = await book.createAccount({
+  //   name: "Expenses",
+  //   type: AccountType.Expense,
+  // });
+  // await book.createAccount({
+  //   name: "Belanja",
+  //   type: AccountType.Expense,
+  //   parent: expense.id,
+  // });
+  // await book.createAccount({
+  //   name: "Equity",
+  //   type: AccountType.Equity,
+  // });
 
-  console.log("setup book", book);
+  // console.log("setup book", book);
   await book.addUser(user.user_id);
 
   // Create root account

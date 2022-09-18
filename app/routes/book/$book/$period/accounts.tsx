@@ -19,12 +19,19 @@ export default function AccountPage() {
           Add Account
         </Link>
       </div>
-      <div id="table-accounts" className="py-2">
+      <div id="table-accounts" className="py-2 text-sm">
         <div className="table w-full">
-          <div className="table-header-group">
+          <div className="table-header-group text-gray-900">
             <div className="table-row">
-              <div className="table-cell w-full">Account</div>
-              <div className="table-cell">Balance</div>
+              <div className="table-cell border-y font-semibold py-2">
+                Account
+              </div>
+              <div className="table-cell border-y font-semibold py-2">
+                Description
+              </div>
+              <div className="table-cell border-y text-right font-semibold py-2">
+                Balance
+              </div>
             </div>
           </div>
           <div className="table-row-group">
@@ -46,8 +53,8 @@ interface AccountRowProps {
 function AccountRow({ account, depth = 0 }: AccountRowProps) {
   return (
     <>
-      <div className="table-row">
-        <div className="table-cell py-2 border-b">
+      <div className="table-row hover:bg-gray-50">
+        <div className="table-cell py-2 border-b font-medium text-gray-700 hover:text-blue-600">
           <Link
             style={{
               marginLeft: `${depth * 20}px`,
@@ -57,8 +64,12 @@ function AccountRow({ account, depth = 0 }: AccountRowProps) {
             {account.name}
           </Link>
         </div>
-        <div className="table-cell text-end border-b">
-          {account.balance.toLocaleString()}
+        <div className="table-cell border-b">
+          {account.description || "n/a"}
+        </div>
+        <div className="table-cell text-end border-b font-medium">
+          {account.balance.toLocaleString()}{" "}
+          <span className="text-gray-600">{account.currency}</span>
         </div>
       </div>
       {account.childrens.map((child) => (
