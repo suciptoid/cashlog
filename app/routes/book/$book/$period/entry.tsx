@@ -107,7 +107,7 @@ export default function EntryPage() {
         <fieldset className="flex justify-end">
           <button
             type="submit"
-            className="bg-teal-500 text-white px-3 py-2 rounded"
+            className="bg-green-500 text-white px-3 py-2 rounded"
           >
             Create Entry
           </button>

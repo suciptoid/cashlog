@@ -178,7 +178,7 @@ export default function Transaction() {
             to="create"
             prefetch="intent"
             id="add-category"
-            className="ml-2 flex-shrink-0 rounded-md bg-teal-500 px-3 py-2 text-sm font-medium text-white"
+            className="ml-2 flex-shrink-0 rounded-md bg-green-500 px-3 py-2 text-sm font-medium text-white"
           >
             Add Transaction
           </Link>

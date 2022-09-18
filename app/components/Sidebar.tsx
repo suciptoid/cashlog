@@ -7,19 +7,30 @@ import {
   FolderOpenIcon,
   QueueListIcon,
 } from "@heroicons/react/24/outline";
-import { Link, useLocation } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useParams } from "@remix-run/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { UserSession } from "~/lib/cookies";
+import { day } from "~/lib/dayjs";
 
 export default function Sidebar({ user }: { user: UserSession }) {
   const ref = useRef<HTMLDivElement>(null);
 
   const [showSidebar, setShowSidebar] = useState(false);
   const { pathname } = useLocation();
+  const params = useParams();
 
   useEffect(() => {
     setShowSidebar(false);
   }, [pathname]);
+
+  const period = useMemo(() => {
+    if (params.period) {
+      return params.period;
+    }
+    return day().startOf("month").valueOf();
+  }, [params.period]);
+
+  console.log("period", period);
 
   return (
     <aside
@@ -42,7 +53,7 @@ export default function Sidebar({ user }: { user: UserSession }) {
             focusable="false"
             data-prefix="fas"
             data-icon="scroll"
-            className="mr-2 h-7 w-7 text-teal-500"
+            className="mr-2 h-7 w-7 text-green-500"
             role="img"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 640 512"
@@ -121,11 +132,11 @@ export default function Sidebar({ user }: { user: UserSession }) {
             Budget
           </NavLink>
           <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
-            Accounting
+            Bookeeping
           </h2>
-          <NavLink to="/book" active={pathname === "/book"}>
+          <NavLink to={`/book/`} active={pathname === "/book"}>
             <BookOpenIcon className="mr-2 h-4 w-4" />
-            Bookkeeping
+            Accounts
           </NavLink>
           <div className="flex-grow" />
         </div>

@@ -22,9 +22,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       throw redirect("/book/setup");
     } else if (books.length == 1) {
       console.log("first book", books);
-      throw redirect(
-        `/book/${books[0].id}/${dayjs().format("YYYY-MM")}/accounts`
-      );
+      throw redirect(`/book/${books[0].id}/${dayjs().valueOf()}/accounts`);
     }
   } else {
     try {

@@ -11,8 +11,8 @@ import {
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
+import type { JournalEntry } from "~/core/ledger";
 import { Book } from "~/core/ledger/book";
-import type { TransactionEntry } from "~/core/ledger/types";
 import dayjs from "~/lib/dayjs";
 
 export default function RangePage() {
@@ -27,7 +27,7 @@ export default function RangePage() {
           <div className="flex-1"></div>
           <Link
             to={`./entry?redirect=${location.pathname}`}
-            className="bg-teal-500 text-white rounded px-3 py-2 text-sm"
+            className="bg-green-500 text-white rounded px-3 py-2 text-sm"
           >
             New Journal Entry
           </Link>
@@ -65,20 +65,20 @@ export function JournalEntryDialog() {
   const params = useParams();
   const { accounts } = useBookData();
   const fetcher = useFetcher();
-  const [entries, setEntries] = useState<TransactionEntry[]>([
+  const [entries, setEntries] = useState<Partial<JournalEntry>[]>([
     {
       account: "",
-      memo: "",
+      description: "",
       amount: 0,
     },
     {
       account: "",
-      memo: "",
+      description: "",
       amount: 0,
     },
   ]);
 
-  const updateEntries = (index: number, data: Partial<TransactionEntry>) => {
+  const updateEntries = (index: number, data: Partial<JournalEntry>) => {
     const updated = entries.map((e, i) => {
       if (i == index)
         return {
@@ -94,7 +94,7 @@ export function JournalEntryDialog() {
   return (
     <Dialog.Root defaultOpen={false}>
       <Dialog.Trigger asChild>
-        <button className="px-3 py-2 text-white bg-teal-500 rounded">
+        <button className="px-3 py-2 text-white bg-green-500 rounded">
           New Journal Entry
         </button>
       </Dialog.Trigger>
@@ -143,7 +143,9 @@ export function JournalEntryDialog() {
                   name={`memo`}
                   className="flex-1"
                   placeholder="Memo"
-                  onChange={(e) => updateEntries(idx, { memo: e.target.value })}
+                  onChange={(e) =>
+                    updateEntries(idx, { description: e.target.value })
+                  }
                 />
                 <input
                   type="number"
@@ -167,7 +169,7 @@ export function JournalEntryDialog() {
             <fieldset className="flex justify-end">
               <button
                 type="submit"
-                className="bg-teal-500 text-white px-3 py-2 rounded"
+                className="bg-green-500 text-white px-3 py-2 rounded"
               >
                 Create Entry
               </button>

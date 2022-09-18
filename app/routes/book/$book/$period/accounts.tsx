@@ -15,7 +15,7 @@ export default function AccountPage() {
     <div className="px-8">
       <div className="flex items-center justify-between py-2">
         <h1 className="font-semibold text-gray-800">Accounts Balance</h1>
-        <Link to="./add" className="px-3 py-1 bg-teal-500 rounded text-white">
+        <Link to="./add" className="px-3 py-1 bg-green-500 rounded text-white">
           Add Account
         </Link>
       </div>

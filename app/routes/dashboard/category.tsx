@@ -59,7 +59,7 @@ export default function CategoryPage() {
           <Link
             to="create"
             replace
-            className="ml-2 rounded-md bg-teal-500 px-3 py-2 text-sm font-medium text-white"
+            className="ml-2 rounded-md bg-green-500 px-3 py-2 text-sm font-medium text-white"
           >
             Add Category
           </Link>

@@ -30,7 +30,7 @@ export default function BookSetupPage() {
         <fieldset className="flex flex-col px-3">
           <button
             type="submit"
-            className="px-3 py-2 bg-teal-500 rounded-md text-white"
+            className="px-3 py-2 bg-green-500 rounded-md text-white"
           >
             Create Bookkeeping
           </button>

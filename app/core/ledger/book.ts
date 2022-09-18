@@ -28,10 +28,6 @@ export class Book {
     this.id = id;
   }
 
-  get haha() {
-    return "haha";
-  }
-
   get ref() {
     if (!this.id) {
       throw new Error("Book id not defined");
