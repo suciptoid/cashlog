@@ -3,7 +3,7 @@ import { redirect } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import Sidebar from "~/components/Sidebar";
 import { Book } from "~/core/ledger";
-import { getBook } from "~/core/ledger/book";
+import { BookNotExists } from "~/core/ledger/errors";
 import { requireUser } from "~/lib/cookies";
 import dayjs from "~/lib/dayjs";
 
@@ -27,8 +27,16 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       );
     }
   } else {
-    const book = await getBook(params.book!);
-    return { user, book };
+    try {
+      const book = await Book.withId(params.book!).getBookInfo();
+      return { user, book };
+    } catch (e) {
+      if (e instanceof BookNotExists) {
+        throw redirect("/book/setup");
+      } else {
+        throw e;
+      }
+    }
   }
 
   return { user };

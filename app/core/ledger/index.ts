@@ -1,5 +1,6 @@
 import type { AccountCreate, AccountWithBalance } from "./account";
 import { AccountFromSnapshot, AccountSchema } from "./account";
+import { BookNotExists } from "./errors";
 import type { JournalCreate, JournalData, JournalEntry } from "./journal";
 import { Journal, JournalSchema } from "./journal";
 import { z } from "zod";
@@ -70,6 +71,10 @@ export class Book {
     return books;
   }
 
+  async exists() {
+    return (await this.ref.child("info").get()).exists();
+  }
+
   async addUser(id: string) {
     const userRef = database.ref(`/users/${id}/bookkeepings/${this.id}`);
     const userSet = userRef.set({
@@ -104,6 +109,10 @@ export class Book {
 
   async getBookInfo(): Promise<BookInfo> {
     const info = await this.ref.child("info").get();
+    if (!info.exists()) {
+      throw new BookNotExists();
+    }
+
     return BookInfoSchema.parse(info.val());
   }
 
