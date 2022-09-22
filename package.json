@@ -24,7 +24,7 @@
     "@radix-ui/react-dialog": "^1.0.0",
     "@remix-run/express": "^1.7.1",
     "@remix-run/node": "^1.7.1",
-    "@remix-run/react": "^1.7.1",
+    "@remix-run/react": "^1.7.2",
     "dayjs": "^1.11.5",
     "firebase": "^9.10.0",
     "firebase-admin": "^11.0.1",
