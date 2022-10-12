@@ -23,7 +23,7 @@ export const AccountSchema = z.object({
   name: z.string(),
   code: z.string().optional(),
   description: z.string().optional(),
-  currency: z.string().default("USD"),
+  currency: z.string().default("IDR"),
   parent: z
     .string()
     .optional()
@@ -38,6 +38,7 @@ const AccountCreateSchema = AccountSchema.omit({
 });
 const AccountWithBalanceSchema = AccountSchema.extend({
   balance: z.number().default(0),
+  balance_raw: z.number().default(0),
 });
 
 const AccountTemplateSchema = z.object({
@@ -61,6 +62,10 @@ export type AccountTemplate = z.infer<typeof AccountTemplateSchema>;
 
 export type AccountTree = AccountWithBalance & {
   childrens: AccountTree[];
+};
+
+export const shouldFlipBalance = (acc: AccountWithBalance) => {
+  return [AccountType.Income, AccountType.Equity].includes(acc.type);
 };
 
 export const personalTemplate = [
@@ -133,7 +138,12 @@ export class Account {
         return tree as AccountTree;
       })
       .map((tree) => {
-        tree.balance = tree.balance + Account.getSubBalance(tree.childrens);
+        tree.balance_raw += Account.getSubBalance(tree.childrens);
+        if (shouldFlipBalance(tree)) {
+          tree.balance = tree.balance_raw * -1;
+        } else {
+          tree.balance = tree.balance_raw;
+        }
         return tree;
       });
     return trees;
@@ -141,7 +151,7 @@ export class Account {
 
   static getSubBalance(accounts: AccountWithBalance[]) {
     return accounts.reduce((sum, acc) => {
-      return sum + acc.balance;
+      return sum + acc.balance_raw;
     }, 0);
   }
 }

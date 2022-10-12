@@ -1,5 +1,9 @@
 import type { AccountCreate, AccountWithBalance } from "./account";
-import { AccountFromSnapshot, AccountSchema } from "./account";
+import {
+  AccountFromSnapshot,
+  AccountSchema,
+  shouldFlipBalance,
+} from "./account";
 import { BookNotExists } from "./errors";
 import type { JournalCreate, JournalData, JournalEntry } from "./journal";
 import { Journal, JournalSchema } from "./journal";
@@ -12,7 +16,9 @@ export const BookInfoSchema = z.object({
   timestamp: z.number(),
   id: z.string(),
   name: z.string(),
+  currency: z.string().default("IDR"),
 });
+
 const CreateBookInfoSchema = BookInfoSchema.omit({ id: true, timestamp: true });
 
 type BookInfo = z.infer<typeof BookInfoSchema>;
@@ -200,12 +206,19 @@ export class Book {
     this.accounts = this.accounts.map((acc) => {
       const result = {
         ...acc,
-        balance: transactions
+        balance_raw: transactions
           .filter((f) => f.account == acc.id)
           .reduce((bal, trx) => {
             return bal + trx.amount;
           }, 0),
       };
+      console.log("get account balance", shouldFlipBalance(result), result);
+      if (shouldFlipBalance(result)) {
+        console.log(result);
+        result.balance = result.balance_raw * -1;
+      } else {
+        result.balance = result.balance_raw;
+      }
       return result;
     });
 

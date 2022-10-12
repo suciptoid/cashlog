@@ -16,17 +16,35 @@ export default function AddAccountPage() {
     <div>
       <h1 className="px-3 py-2 font-semibold text-gray-800">Add Account</h1>
       <Form method="post" replace className="px-3 py-2">
-        <fieldset className="py-2 flex flex-col">
-          <label htmlFor="name" className="text-sm font-medium text-gray-500">
-            Account Name
-          </label>
-          <input
-            className="px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-teal-100 border border-gray-200 rounded"
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Account Name"
-          />
+        <fieldset className="flex gap-3">
+          <fieldset className="py-2 flex flex-col flex-1">
+            <label htmlFor="name" className="text-sm font-medium text-gray-500">
+              Account Name
+            </label>
+            <input
+              className="px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-teal-100 border border-gray-200 rounded"
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Account Name"
+            />
+          </fieldset>
+          <fieldset className="py-2 flex flex-col flex-1">
+            <label
+              htmlFor="currency"
+              className="text-sm font-medium text-gray-500"
+            >
+              Currency
+            </label>
+            <select
+              name="currency"
+              className="border rounded-md  py-2 px-3 outline-none focus:ring focus:ring-teal-100"
+              defaultValue="IDR"
+            >
+              <option value="USD">USD</option>
+              <option value="IDR">IDR</option>
+            </select>
+          </fieldset>
         </fieldset>
         <fieldset className="py-2 flex flex-col">
           <label className="text-sm font-medium text-gray-500" htmlFor="type">
@@ -92,6 +110,7 @@ const CreateAccountDTO = z.object({
   parent: z.string().optional(),
   type: z.nativeEnum(AccountType),
   description: z.string().optional(),
+  currency: z.string().default("IDR"),
 });
 
 export const action = async ({ request, params }: ActionArgs) => {
