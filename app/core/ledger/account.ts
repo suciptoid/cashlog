@@ -65,7 +65,11 @@ export type AccountTree = AccountWithBalance & {
 };
 
 export const shouldFlipBalance = (acc: AccountWithBalance) => {
-  return [AccountType.Income, AccountType.Equity].includes(acc.type);
+  return [
+    AccountType.Income,
+    AccountType.Equity,
+    AccountType.Liability,
+  ].includes(acc.type);
 };
 
 export const personalTemplate = [
@@ -139,7 +143,7 @@ export class Account {
       })
       .map((tree) => {
         tree.balance_raw += Account.getSubBalance(tree.childrens);
-        if (shouldFlipBalance(tree)) {
+        if (shouldFlipBalance(tree) && tree.balance_raw !== 0) {
           tree.balance = tree.balance_raw * -1;
         } else {
           tree.balance = tree.balance_raw;

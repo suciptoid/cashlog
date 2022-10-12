@@ -212,9 +212,7 @@ export class Book {
             return bal + trx.amount;
           }, 0),
       };
-      console.log("get account balance", shouldFlipBalance(result), result);
-      if (shouldFlipBalance(result)) {
-        console.log(result);
+      if (shouldFlipBalance(result) && result.balance_raw != 0) {
         result.balance = result.balance_raw * -1;
       } else {
         result.balance = result.balance_raw;
