@@ -27,6 +27,9 @@ export default function AccountPage() {
                 Account
               </div>
               <div className="table-cell border-y font-semibold py-2">
+                Account Type
+              </div>
+              <div className="table-cell border-y font-semibold py-2">
                 Description
               </div>
               <div className="table-cell border-y text-right font-semibold py-2">
@@ -64,9 +67,10 @@ function AccountRow({ account, depth = 0 }: AccountRowProps) {
             {account.name}
           </Link>
         </div>
-        <div className="table-cell border-b">
-          {account.description || "n/a"}
+        <div className="table-cell border-b text-gray-500 capitalize">
+          {account.type.toLocaleLowerCase()}
         </div>
+        <div className="table-cell border-b">{account.description || "-"}</div>
         <div className="table-cell text-end border-b font-medium">
           {account.balance.toLocaleString()}{" "}
           <span className="text-gray-600">{account.currency}</span>
