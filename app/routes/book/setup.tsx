@@ -1,6 +1,7 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import TimezonePicker from "~/components/TimezonePicker";
 import { Book, BookInfoSchema } from "~/core/ledger/book";
 import { requireUser } from "~/lib/cookies";
 
@@ -17,13 +18,13 @@ export default function BookSetupPage() {
 
       <Form method="post" className="w-1/3">
         <fieldset className="flex flex-col px-3">
-          <label htmlFor="name font-medium text-sm">Name</label>
+          <label htmlFor="name font-medium text-sm">Book Name</label>
           <input
             type="text"
             name="name"
             id="name"
             className="border rounded-md my-1 py-2 px-3 outline-none focus:ring focus:ring-teal-100"
-            placeholder="Bookkeeping name"
+            placeholder="Book name"
           />
         </fieldset>
         <fieldset className="flex flex-col px-3">
@@ -36,6 +37,10 @@ export default function BookSetupPage() {
             <option value="USD">USD</option>
             <option value="IDR">IDR</option>
           </select>
+        </fieldset>
+        <fieldset className="flex flex-col px-3">
+          <label htmlFor="name font-medium text-sm">Timezone</label>
+          <TimezonePicker />
         </fieldset>
         <fieldset className="flex flex-col px-3 py-2">
           <button

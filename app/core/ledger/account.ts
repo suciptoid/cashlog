@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 
 export enum AccountType {
   Asset = "ASSET",
@@ -132,25 +132,24 @@ export const accountTemplates = [
 
 export class Account {
   static toTree(accounts: AccountWithBalance[], parent?: string) {
-    const trees = accounts
-      .filter((f) => f.parent == parent)
-      .map((acc) => {
-        const tree = {
-          ...acc,
-          childrens: Account.toTree(accounts, acc.id),
-        } as AccountTree;
-        return tree as AccountTree;
-      })
-      .map((tree) => {
-        tree.balance_raw += Account.getSubBalance(tree.childrens);
-        if (shouldFlipBalance(tree) && tree.balance_raw !== 0) {
-          tree.balance = tree.balance_raw * -1;
-        } else {
-          tree.balance = tree.balance_raw;
-        }
-        return tree;
-      });
-    return trees;
+    return accounts
+        .filter((f) => f.parent == parent)
+        .map((acc) => {
+          const tree = {
+            ...acc,
+            childrens: Account.toTree(accounts, acc.id),
+          } as AccountTree;
+          return tree as AccountTree;
+        })
+        .map((tree) => {
+          tree.balance_raw += Account.getSubBalance(tree.childrens);
+          if (shouldFlipBalance(tree) && tree.balance_raw !== 0) {
+            tree.balance = tree.balance_raw * -1;
+          } else {
+            tree.balance = tree.balance_raw;
+          }
+          return tree;
+        });
   }
 
   static getSubBalance(accounts: AccountWithBalance[]) {

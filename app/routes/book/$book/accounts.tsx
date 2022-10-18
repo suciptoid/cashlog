@@ -1,4 +1,4 @@
-import { useBookData } from "../$period";
+import { useBookData } from "../$book";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
 import type { AccountTree } from "~/core/ledger/account";

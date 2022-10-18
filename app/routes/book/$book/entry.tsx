@@ -1,19 +1,17 @@
-import { useBookData } from "../$period";
+import { useBookData } from "../$book";
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import qs from "qs";
 import { useState } from "react";
-// import { getAccounts } from "~/core/ledger/account";
 import { z } from "zod";
 import { PageHeader } from "~/components/PageHeader";
+import type { JournalEntry } from "~/core/ledger";
 import { Book } from "~/core/ledger/book";
-import type { TransactionEntry } from "~/core/ledger/types";
 
 export default function EntryPage() {
-  // const { accounts } = useLoaderData<typeof loader>();
   const { accounts } = useBookData();
-  const [entries, setEntries] = useState<TransactionEntry[]>([
+  const [entries, setEntries] = useState<Partial<JournalEntry>[]>([
     {
       account: "",
       amount: 0,
@@ -24,7 +22,7 @@ export default function EntryPage() {
     },
   ]);
 
-  const updateEntries = (index: number, data: Partial<TransactionEntry>) => {
+  const updateEntries = (index: number, data: Partial<JournalEntry>) => {
     const updated = entries.map((e, i) => {
       if (i == index)
         return {
@@ -83,8 +81,10 @@ export default function EntryPage() {
               name={`entries[${idx}][description]`}
               className="flex-1"
               placeholder="Memo"
-              defaultValue={m.memo}
-              onChange={(e) => updateEntries(idx, { memo: e.target.value })}
+              defaultValue={m.description}
+              onChange={(e) =>
+                updateEntries(idx, { description: e.target.value })
+              }
             />
             <input
               type="number"

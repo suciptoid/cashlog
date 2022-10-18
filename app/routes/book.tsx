@@ -5,7 +5,6 @@ import Sidebar from "~/components/Sidebar";
 import { Book } from "~/core/ledger/book";
 import { BookNotExists } from "~/core/ledger/errors";
 import { requireUser } from "~/lib/cookies";
-import dayjs from "~/lib/dayjs";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const user = await requireUser(request);
@@ -18,15 +17,17 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     const url = new URL(request.url);
 
     if (books.length == 0 && url.pathname != "/book/setup") {
-      console.log(request.url);
+      // Redirect to setup new book
       throw redirect("/book/setup");
     } else if (books.length == 1) {
+      // Redirect to first book
       console.log("first book", books);
-      throw redirect(`/book/${books[0].id}/${dayjs().valueOf()}/accounts`);
+      throw redirect(`/book/${books[0].id}/accounts`);
     }
   } else {
     try {
-      const book = await Book.withId(params.book!).getBookInfo();
+      const book = Book.withId(params.book);
+
       return { user, book };
     } catch (e) {
       if (e instanceof BookNotExists) {
@@ -48,9 +49,15 @@ export default function DashboardIndex() {
       <Sidebar user={user} />
 
       <div
-        id="dashboard-page"
+        id="bookeeping-page"
         className="sticky flex h-screen flex-grow flex-col overflow-y-auto"
       >
+        <div
+          id="experiment-flag"
+          className="text-center w-full bg-yellow-200 py-2 text-yellow-700 "
+        >
+          This page is in experimental, dont use with real data
+        </div>
         <Outlet />
       </div>
     </main>
