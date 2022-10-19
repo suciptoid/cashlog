@@ -29,38 +29,42 @@ export default function JournalPage() {
         <div className="table w-full">
           <div className="table-header-group py-3 text-sm font-semibold text-gray-800">
             <div className="table-row">
-              <div className="table-cell py-3">Date</div>
-              <div className="table-cell">Account</div>
-              <div className="table-cell">Description</div>
-              <div className="table-cell text-end">Debit</div>
-              <div className="table-cell text-end">Credit</div>
+              <div className="table-cell py-3 px-2">Date</div>
+              <div className="table-cell px-2">Description</div>
+              <div className="table-cell px-2">Account</div>
+              <div className="table-cell text-end px-2 py-1">Debit</div>
+              <div className="table-cell text-end px-2 py-1">Credit</div>
             </div>
           </div>
           <div className="table-row-group">
             {lists.map((journal) => (
               <Fragment key={journal.id}>
-                <div className="table-row">
-                  <div className="table-cell border-t pt-2">
+                <div className="table-row text-sm bg-gray-50">
+                  <div className="table-cell border-t border-b border-l pt-2 px-2 py-1 font-semibold text-gray-700">
                     {dayjs(journal.date).format("DD/MM/YYYY")}
                   </div>
-                  <div className="table-cell border-t"></div>
-                  <div className="table-cell border-t">
+                  <div className="table-cell border-t border-l px-2 py-1">
                     {journal.description}
                   </div>
                   <div className="table-cell border-t"></div>
                   <div className="table-cell border-t"></div>
+                  <div className="table-cell border-t border-r"></div>
                 </div>
                 {journal.entries.map((entry) => (
-                  <div key={entry.id} className="table-row">
-                    <div className="table-cell">
+                  <div key={entry.id} className="table-row text-sm">
+                    <div className="table-cell border-l">
                       {/* {dayjs(journal.date).format("DD/MM/YYYY")} */}
                     </div>
-                    <div className="table-cell">{entry.account_name}</div>
-                    <div className="table-cell">{entry.description}</div>
-                    <div className="table-cell text-end">
+                    <div className="table-cell px-2 py-1 border">
+                      {entry.description}
+                    </div>
+                    <div className="table-cell border px-2 py-1 font-semibold">
+                      {entry.account_name}
+                    </div>
+                    <div className="table-cell text-end border px-2 py-1 font-semibold text-gray-800">
                       {entry.amount > 0 ? entry.amount.toLocaleString() : ""}
                     </div>
-                    <div className="table-cell text-end">
+                    <div className="table-cell text-end border px-2 py-1 font-semibold text-gray-800">
                       {entry.amount < 0
                         ? Math.abs(entry.amount).toLocaleString()
                         : ""}
