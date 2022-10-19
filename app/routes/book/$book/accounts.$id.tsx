@@ -1,4 +1,4 @@
-import { useBookData } from "../$period";
+import { useBookData } from "../$book";
 import { Link, useParams } from "@remix-run/react";
 import dayjs from "dayjs";
 import { useMemo } from "react";

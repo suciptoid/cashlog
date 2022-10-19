@@ -17,6 +17,7 @@ export const BookInfoSchema = z.object({
   id: z.string(),
   name: z.string(),
   currency: z.string().default("IDR"),
+  timezone: z.string().default("UTC"),
 });
 
 const CreateBookInfoSchema = BookInfoSchema.omit({ id: true, timestamp: true });

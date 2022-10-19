@@ -1,4 +1,4 @@
-import { useBookData } from "../$period";
+import { useBookData } from "../$book";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";

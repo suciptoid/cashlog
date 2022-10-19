@@ -2,15 +2,15 @@ import { NavLink } from "./NavLink";
 import UserMenu from "./UserMenu";
 import {
   BookOpenIcon,
+  BuildingLibraryIcon,
   ChartPieIcon,
   CreditCardIcon,
   FolderOpenIcon,
   QueueListIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useLocation, useParams } from "@remix-run/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UserSession } from "~/lib/cookies";
-import { day } from "~/lib/dayjs";
 
 export default function Sidebar({ user }: { user: UserSession }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -22,15 +22,6 @@ export default function Sidebar({ user }: { user: UserSession }) {
   useEffect(() => {
     setShowSidebar(false);
   }, [pathname]);
-
-  const period = useMemo(() => {
-    if (params.period) {
-      return params.period;
-    }
-    return day().startOf("month").valueOf();
-  }, [params.period]);
-
-  console.log("period", period);
 
   return (
     <aside
@@ -98,46 +89,70 @@ export default function Sidebar({ user }: { user: UserSession }) {
           id="side-nav-link"
           className="w-full flex-grow flex-col items-center justify-end px-2 py-3 text-sm font-medium"
         >
-          <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
-            Cashflow
-          </h2>
-          <NavLink
-            to="/dashboard/transaction"
-            active={pathname === "/dashboard/transaction"}
-          >
-            <QueueListIcon className="mr-2 h-4 w-4" />
-            Transactions
-          </NavLink>
+          {pathname.match(/(dashboard)(\/.*)?/) != null ? (
+            <>
+              <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
+                Cashflow
+              </h2>
+              <NavLink
+                to="/dashboard/transaction"
+                active={pathname === "/dashboard/transaction"}
+              >
+                <QueueListIcon className="mr-2 h-4 w-4" />
+                Transactions
+              </NavLink>
 
-          <NavLink
-            to="/dashboard/account"
-            active={pathname === "/dashboard/account"}
-          >
-            <CreditCardIcon className="mr-2 h-4 w-4" />
-            Accounts
-          </NavLink>
+              <NavLink
+                to="/dashboard/account"
+                active={pathname === "/dashboard/account"}
+              >
+                <CreditCardIcon className="mr-2 h-4 w-4" />
+                Accounts
+              </NavLink>
 
-          <NavLink
-            active={pathname === "/dashboard/category"}
-            to="/dashboard/category"
-          >
-            <FolderOpenIcon className="mr-2 h-4 w-4" />
-            Category
-          </NavLink>
-          <NavLink
-            active={pathname === "/dashboard/budget"}
-            to="/dashboard/budget"
-          >
-            <ChartPieIcon className="mr-2 h-4 w-4" />
-            Budget
-          </NavLink>
-          <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
-            Bookeeping
-          </h2>
-          <NavLink to={`/book/`} active={pathname === "/book"}>
-            <BookOpenIcon className="mr-2 h-4 w-4" />
-            Accounts
-          </NavLink>
+              <NavLink
+                active={pathname === "/dashboard/category"}
+                to="/dashboard/category"
+              >
+                <FolderOpenIcon className="mr-2 h-4 w-4" />
+                Category
+              </NavLink>
+              <NavLink
+                active={pathname === "/dashboard/budget"}
+                to="/dashboard/budget"
+              >
+                <ChartPieIcon className="mr-2 h-4 w-4" />
+                Budget
+              </NavLink>
+              <NavLink to={`/book/`} active={pathname === "/book"}>
+                <BookOpenIcon className="mr-2 h-4 w-4" />
+                Bookeeping{" "}
+                <span className="px-2 rounded-full  py-0.5 mx-2 text-xs bg-yellow-400 text-white">
+                  new
+                </span>
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <h2 className="w-full px-2 py-2 text-xs font-semibold uppercase text-gray-500">
+                Bookeeping
+              </h2>
+              <NavLink
+                to={`/book/${params.book ? `${params.book}/accounts` : ""}`}
+                active={pathname.includes("/account")}
+              >
+                <BuildingLibraryIcon className="mr-2 h-4 w-4" />
+                Accounts
+              </NavLink>
+              <NavLink
+                to={`/book/${params.book ? `${params.book}/journal` : ""}`}
+                active={pathname.includes("/journal")}
+              >
+                <BookOpenIcon className="mr-2 h-4 w-4" />
+                Journal
+              </NavLink>
+            </>
+          )}
           <div className="flex-grow" />
         </div>
         <div className="w-full border-t px-3 py-2">
