@@ -12,30 +12,50 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "npm"
+          cache: "pnpm"
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
       - uses: actions/setup-java@v3
         with:
           distribution: "adopt"
           java-version: "11"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
       - name: Cache
         uses: actions/cache@v3
-        id: test-npm-cache
+        id: test-pnpm-cache
         with:
           path: |
-            ~/.npm
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-cashlog-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-cashlog-
+
       - name: Install Firebase Tools
-        run: npm install -g firebase-tools --quiet
+        run: pnpm add -g firebase-tools --quiet
+
       - name: Install App Dependencies
-        run: npm install
+        run: pnpm install
+
       - name: Add config
         run: echo '${{ secrets.FIREBASE_CONFIG }}' > firebase.config.json
+
       - name: Test With Firebase Emulator
         run: firebase emulators:exec --only auth,firestore,database "npm run test" --project test
         env:
@@ -50,31 +70,49 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "npm"
+          cache: "pnpm"
+      
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
       - uses: actions/setup-java@v3
         with:
           distribution: "adopt"
           java-version: "11"
+
       - name: Cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.npm
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             ${{ github.workspace }}/.cache
           key: ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
             ${{ runner.os }}-cashlog-${{ hashFiles('**/package-lock.json') }}-
+
       - name: Install Firebase Tools
-        run: npm install -g firebase-tools --quiet
+        run: pnpm install -g firebase-tools --quiet
+
       - name: Add config
         run: echo '${{ secrets.FIREBASE_CONFIG }}' > firebase.config.json
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
       - name: Build
-        run: npm run build
+        run: pnpm run build
       - name: Firebase Prepare
         run: node functions/install.js
       - name: Deploy to Firebase
