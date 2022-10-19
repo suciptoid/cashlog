@@ -1,7 +1,5 @@
 import { useState } from "react";
-
-// @ts-ignore
-const timezones: string[] = Intl.supportedValuesOf("timeZone");
+import timezones from "~/lib/timezones";
 
 export default function TimezonePicker() {
   const [selected] = useState<string>(
