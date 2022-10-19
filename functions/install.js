@@ -13,11 +13,11 @@ function build() {
 
   // Append dependencies firebase-functions if not exists
   if (!packageJson.dependencies["firebase-functions"]) {
-    packageJson.dependencies["firebase-functions"] = "^3.22.0";
+    packageJson.dependencies["firebase-functions"] = "^4.0.1";
   }
 
   // temporary downgrade firebase-admin
-  packageJson.dependencies["firebase-admin"] = "^10.3.0";
+  // packageJson.dependencies["firebase-admin"] = "^10.3.0";
 
   copy(path.join(cwd, "build"), path.join(cwd, "functions", "remix"));
 
