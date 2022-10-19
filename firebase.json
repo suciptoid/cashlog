@@ -28,7 +28,6 @@
     ]
   },
   "functions": {
-    "codebase": "remix",
     "runtime": "nodejs16",
     "predeploy": [
       "npm i -w functions"

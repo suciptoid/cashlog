@@ -13,7 +13,8 @@ function build() {
 
   // Append dependencies firebase-functions if not exists
   if (!packageJson.dependencies["firebase-functions"]) {
-    packageJson.dependencies["firebase-functions"] = "^4.0.1";
+    packageJson.dependencies["firebase-functions"] = "^3.24.1";
+    // packageJson.dependencies["firebase-functions"] = "^4.0.1";
   }
 
   // temporary downgrade firebase-admin
