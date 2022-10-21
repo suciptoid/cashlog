@@ -23,7 +23,7 @@
     "@heroicons/react": "^2.0.12",
     "@radix-ui/react-dialog": "^1.0.0",
     "@remix-run/express": "^1.7.2",
-    "@remix-run/node": "^1.7.2",
+    "@remix-run/node": "^1.7.3",
     "@remix-run/react": "^1.7.2",
     "dayjs": "^1.11.5",
     "firebase": "^9.12.0",
