@@ -1,31 +1,10 @@
 import { Book } from "./book";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
-import rules from "~/database-rules.json";
+import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import { day } from "~/lib/dayjs";
 import { database } from "~/lib/firebase.server";
 import { generateId } from "~/lib/id";
 
 describe("Ledger Class", () => {
-  beforeAll(async () => {
-    // Set rules
-    const res = await fetch(
-      "http:/127.0.0.1:9999/.settings/rules.json?access_token=123&ns=test",
-      {
-        method: "PUT",
-        body: JSON.stringify(rules),
-      }
-    );
-    expect(res.status).toEqual(200);
-  });
-
   describe("Book", () => {
     const id = generateId();
     const ref = database.ref(`/books/${id}/info`);
