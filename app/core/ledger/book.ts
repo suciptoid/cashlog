@@ -46,6 +46,15 @@ export class Book {
     return this.ref.child("journals");
   }
 
+  async getBookTimezone() {
+    if (!this.info) {
+      this.info = await this.getBookInfo();
+    }
+    const offset = day().tz(this.info.timezone).utcOffset();
+    const instance = day().utcOffset(offset);
+    return instance;
+  }
+
   static withId(id: string, load = false) {
     const book = new Book(id);
     return book;
@@ -116,7 +125,10 @@ export class Book {
       throw new BookNotExists();
     }
 
-    return BookInfoSchema.parse(info.val());
+    const parsed = BookInfoSchema.parse(info.val());
+    // Set default timezone to book timezone
+    day.tz.setDefault(parsed.timezone);
+    return parsed;
   }
 
   async delete() {
