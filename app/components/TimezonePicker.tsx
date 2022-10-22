@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import timezones from "~/lib/timezones";
 
 export default function TimezonePicker() {
-  const [selected] = useState<string>(
+  const [selected, setSelected] = useState<string | undefined>(
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
+  console.log("default selected", selected);
+
+  useEffect(() => {
+    setSelected(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
   return (
     <select
       className="timezone-picker border rounded-md my-1 py-2 px-3 outline-none focus:ring focus:ring-teal-100"
