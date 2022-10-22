@@ -6,12 +6,13 @@ import qs from "qs";
 import { z } from "zod";
 import { AccountType } from "~/core/ledger/account";
 import { Book } from "~/core/ledger/book";
+import dayjs from "~/lib/dayjs";
 
 // import { createAccount, getAccounts } from "~/core/ledger/account";
 
 export default function AddAccountPage() {
   // const { accounts } = useLoaderData<typeof loader>();
-  const { accounts } = useBookData();
+  const { accounts, info } = useBookData();
   return (
     <div>
       <h1 className="px-3 py-2 font-semibold text-gray-800">Add Account</h1>
@@ -39,7 +40,7 @@ export default function AddAccountPage() {
             <select
               name="currency"
               className="border rounded-md  py-2 px-3 outline-none focus:ring focus:ring-teal-100"
-              defaultValue="IDR"
+              defaultValue={info?.currency || "IDR"}
             >
               <option value="USD">USD</option>
               <option value="IDR">IDR</option>
@@ -116,9 +117,21 @@ const CreateAccountDTO = z.object({
 export const action = async ({ request, params }: ActionArgs) => {
   const data = await request.text();
   const parsed = CreateAccountDTO.parse(qs.parse(data));
-  const acc = await Book.withId(params.book!).createAccount(parsed);
+  const book = Book.withId(params.book!);
+  const acc = await book.createAccount(parsed);
 
   console.log("create account", acc);
+
+  // Create previous period account balance to 0
+  const period = dayjs()
+    .utcOffset(await book.getBookOffset())
+    .subtract(1, "month")
+    .valueOf();
+
+  await book.setAccountBalance(period, {
+    account: acc.id,
+    balance: 0,
+  });
 
   return redirect(`/book/${params.book}`);
 };

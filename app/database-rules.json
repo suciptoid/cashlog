@@ -8,6 +8,15 @@
           ".indexOn": [
             "date"
           ]
+        },
+        "balance": {
+          "account": {
+            "monthly": {
+              ".indexOn": [
+                "date"
+              ]
+            }
+          }
         }
       }
     }

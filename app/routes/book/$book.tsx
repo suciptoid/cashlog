@@ -13,9 +13,10 @@ export const BookParams = z.object({
 export const loader = async ({ request, params }: LoaderArgs) => {
   const p = BookParams.parse(params);
   const book = Book.withId(p.book);
-  await book.loadAll();
 
-  return book;
+  const data = await book.getData();
+
+  return data;
 };
 
 export default function BookPage() {

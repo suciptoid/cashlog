@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export enum AccountType {
   Asset = "ASSET",
@@ -31,6 +31,21 @@ export const AccountSchema = z.object({
   type: z.nativeEnum(AccountType),
   sub_type: z.nativeEnum(AccountSubType).optional(),
 });
+
+export const AccountBalanceSchema = z.object({
+  balance: z.number().default(0),
+  date: z.number(),
+  timestamp: z.number().default(Date.now()),
+  account: z.string(),
+});
+
+export const AccountBalanceSnap = z.map(z.string(), AccountBalanceSchema);
+
+export const AccountBalanceFromSnapshot = z
+  .any()
+  .transform((v) => new Map(Object.entries(v)))
+  .transform((v) => AccountBalanceSnap.parse(v))
+  .transform((v) => Array.from(v.values()));
 
 const AccountPartialSchema = AccountSchema.partial();
 const AccountCreateSchema = AccountSchema.omit({
@@ -133,23 +148,23 @@ export const accountTemplates = [
 export class Account {
   static toTree(accounts: AccountWithBalance[], parent?: string) {
     return accounts
-        .filter((f) => f.parent == parent)
-        .map((acc) => {
-          const tree = {
-            ...acc,
-            childrens: Account.toTree(accounts, acc.id),
-          } as AccountTree;
-          return tree as AccountTree;
-        })
-        .map((tree) => {
-          tree.balance_raw += Account.getSubBalance(tree.childrens);
-          if (shouldFlipBalance(tree) && tree.balance_raw !== 0) {
-            tree.balance = tree.balance_raw * -1;
-          } else {
-            tree.balance = tree.balance_raw;
-          }
-          return tree;
-        });
+      .filter((f) => f.parent == parent)
+      .map((acc) => {
+        const tree = {
+          ...acc,
+          childrens: Account.toTree(accounts, acc.id),
+        } as AccountTree;
+        return tree as AccountTree;
+      })
+      .map((tree) => {
+        tree.balance_raw += Account.getSubBalance(tree.childrens);
+        if (shouldFlipBalance(tree) && tree.balance_raw !== 0) {
+          tree.balance = tree.balance_raw * -1;
+        } else {
+          tree.balance = tree.balance_raw;
+        }
+        return tree;
+      });
   }
 
   static getSubBalance(accounts: AccountWithBalance[]) {

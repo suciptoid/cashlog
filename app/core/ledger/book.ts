@@ -1,5 +1,7 @@
 import type { AccountCreate, AccountWithBalance } from "./account";
 import {
+  AccountBalanceFromSnapshot,
+  AccountBalanceSchema,
   AccountFromSnapshot,
   AccountSchema,
   shouldFlipBalance,
@@ -8,7 +10,7 @@ import { BookNotExists } from "./errors";
 import type { JournalCreate, JournalData, JournalEntry } from "./journal";
 import { Journal, JournalSchema } from "./journal";
 import { z } from "zod";
-import { day } from "~/lib/dayjs";
+import dayjs, { day } from "~/lib/dayjs";
 import { database } from "~/lib/firebase.server";
 import { generateId } from "~/lib/id";
 
@@ -46,13 +48,12 @@ export class Book {
     return this.ref.child("journals");
   }
 
-  async getBookTimezone() {
+  async getBookOffset() {
     if (!this.info) {
       this.info = await this.getBookInfo();
     }
     const offset = day().tz(this.info.timezone).utcOffset();
-    const instance = day().utcOffset(offset);
-    return instance;
+    return offset;
   }
 
   static withId(id: string, load = false) {
@@ -114,9 +115,91 @@ export class Book {
     this.getAccountBalance();
   }
 
+  async getData(date?: number) {
+    const all = await Promise.all([
+      this.getAccounts(), // 0
+      this.getBookInfo(), // 1
+      this.getJournals(date), // 2
+      this.getPreviousBalance(date), // 3
+    ]);
+
+    const journals = all[2];
+    const bookInfo = all[1];
+    const prevBalance = all[3];
+
+    const transactions = Journal.flatten(journals);
+
+    const accounts = all[0].map((acc) => {
+      const result = {
+        ...acc,
+        balance_raw: transactions
+          .filter((f) => f.account == acc.id)
+          .reduce((bal, trx) => {
+            return bal + trx.amount;
+          }, 0),
+      };
+      // If has previous balance
+      const prev = prevBalance.find((f) => f.account == acc.id);
+      if (prev) {
+        result.balance_raw += prev.balance;
+      }
+      if (shouldFlipBalance(result) && result.balance_raw != 0) {
+        result.balance = result.balance_raw * -1;
+      } else {
+        result.balance = result.balance_raw;
+      }
+      return result;
+    });
+
+    return {
+      journals,
+      accounts,
+      info: bookInfo,
+      prev_balance: prevBalance,
+    };
+  }
+
+  async getPreviousBalance(curentPeriod?: number) {
+    const offset = await this.getBookOffset();
+    const lastPeriod = dayjs(curentPeriod)
+      .utcOffset(offset)
+      .subtract(1, "month")
+      .endOf("month")
+      .valueOf();
+
+    const ref = this.ref.child(`balance/account/monthly`);
+    const result = await ref.orderByChild("date").equalTo(lastPeriod).get();
+
+    if (!result.exists()) {
+      return [];
+    }
+
+    return AccountBalanceFromSnapshot.parse(result.val());
+  }
+
   async setInfo(info: Partial<BookInfo>) {
     await this.ref.child("info").set(info);
-    return info;
+    const parsed = BookInfoSchema.parse(info);
+
+    return parsed;
+  }
+
+  async setAccountBalance(
+    period: number,
+    { account, balance }: { account: string; balance: number }
+  ) {
+    const offset = await this.getBookOffset();
+    const date = dayjs(period).utcOffset(offset).endOf("month").valueOf();
+    const ref = this.ref.child(`balance/account/monthly/${date}-${account}`);
+    const accBalance = AccountBalanceSchema.parse({
+      account,
+      balance,
+      date,
+      timestamp: Date.now(),
+    });
+    console.log("set account balance", accBalance);
+    await ref.set(accBalance);
+    return accBalance;
   }
 
   async getBookInfo(): Promise<BookInfo> {
@@ -127,11 +210,11 @@ export class Book {
 
     const parsed = BookInfoSchema.parse(info.val());
     // Set default timezone to book timezone
-    day.tz.setDefault(parsed.timezone);
     return parsed;
   }
 
   async delete() {
+    // TODO: Delete user referene
     return await this.ref.remove();
   }
 
@@ -163,10 +246,15 @@ export class Book {
     });
   }
 
-  async getJournals(month?: number) {
+  async getJournals(period?: number) {
     const ref = this.journalRef;
-    const start = day(month).startOf("month").valueOf();
-    const end = day(month).endOf("month").valueOf();
+    const offset = await this.getBookOffset();
+
+    // Start and end period for defined month based on book timezone
+    const start = day(period).utcOffset(offset).startOf("month").valueOf();
+    const end = day(period).utcOffset(offset).endOf("month").valueOf();
+
+    // Get previous balance
 
     const snapshots = await ref
       .orderByChild("date")

@@ -29,15 +29,18 @@ describe("Ledger Class", () => {
   describe("Book", () => {
     const id = generateId();
     const ref = database.ref(`/books/${id}/info`);
+
     beforeEach(async () => {
       await ref.set({
         id: id,
         timestamp: Date.now(),
         name: "Book 1",
+        timezone: "UTC",
       });
     });
+
     afterEach(async () => {
-      await ref.remove();
+      await Book.withId(id).delete();
     });
 
     it("Get book from id", async () => {
@@ -48,11 +51,6 @@ describe("Ledger Class", () => {
     });
 
     describe("Journal", () => {
-      const id = "journal-" + generateId();
-      afterEach(async () => {
-        await Book.withId(id).delete();
-      });
-
       it("create journal entry", async () => {
         const book = Book.withId(id);
         await book.createJournal({
