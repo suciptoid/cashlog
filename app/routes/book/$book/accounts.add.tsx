@@ -6,7 +6,6 @@ import qs from "qs";
 import { z } from "zod";
 import { AccountType } from "~/core/ledger/account";
 import { Book } from "~/core/ledger/book";
-import dayjs from "~/lib/dayjs";
 
 // import { createAccount, getAccounts } from "~/core/ledger/account";
 
@@ -118,20 +117,7 @@ export const action = async ({ request, params }: ActionArgs) => {
   const data = await request.text();
   const parsed = CreateAccountDTO.parse(qs.parse(data));
   const book = Book.withId(params.book!);
-  const acc = await book.createAccount(parsed);
-
-  console.log("create account", acc);
-
-  // Create previous period account balance to 0
-  const period = dayjs()
-    .utcOffset(await book.getBookOffset())
-    .subtract(1, "month")
-    .valueOf();
-
-  await book.setAccountBalance(period, {
-    account: acc.id,
-    balance: 0,
-  });
+  await book.createAccount(parsed);
 
   return redirect(`/book/${params.book}`);
 };

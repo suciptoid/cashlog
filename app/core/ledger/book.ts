@@ -1,4 +1,8 @@
-import type { AccountCreate, AccountWithBalance } from "./account";
+import type {
+  AccountBalance,
+  AccountCreate,
+  AccountWithBalance,
+} from "./account";
 import {
   AccountBalanceFromSnapshot,
   AccountBalanceSchema,
@@ -119,7 +123,7 @@ export class Book {
     const all = await Promise.all([
       this.getAccounts(), // 0
       this.getBookInfo(), // 1
-      this.getJournals(date), // 2
+      this.getJournals(date, date), // 2
       this.getPreviousBalance(date), // 3
     ]);
 
@@ -171,10 +175,128 @@ export class Book {
     const result = await ref.orderByChild("date").equalTo(lastPeriod).get();
 
     if (!result.exists()) {
+      const calculated = await this.calculatePreviousBalance();
+      if (calculated) {
+        // Save calculated
+        await Promise.all(
+          calculated.map((cal) =>
+            this.setAccountBalance(cal.date, {
+              account: cal.account,
+              balance: cal.balance,
+            })
+          )
+        );
+
+        return calculated.filter((f) => f.date == lastPeriod);
+      }
       return [];
     }
 
     return AccountBalanceFromSnapshot.parse(result.val());
+  }
+
+  async calculatePreviousBalance() {
+    const offset = await this.getBookOffset();
+
+    // get latest cached balance
+    const latest = await this.ref
+      .child("balance/account/monthly")
+      .orderByChild("date")
+      .limitToLast(1)
+      .get();
+
+    if (!latest.exists()) {
+      console.log("no previous cached balance");
+      return [];
+    }
+
+    const latestParsed = AccountBalanceFromSnapshot.parse(latest.val());
+    if (latestParsed.length != 1) {
+      console.log("latest date not found to calculate account balance");
+      return [];
+    }
+
+    const lastDate = latestParsed[0].date;
+    const start = dayjs(lastDate)
+      .add(1, "month")
+      .utcOffset(offset)
+      .startOf("month");
+
+    const end = dayjs().utcOffset(offset).subtract(1, "month").endOf("month");
+
+    const batch = await Promise.all([
+      this.getPreviousBalance(start.valueOf()),
+      this.getJournals(start.valueOf(), end.valueOf()),
+    ]);
+    const journals = batch[1];
+    const prevs = batch[0];
+    const transactions = Journal.flatten(journals);
+
+    const balances = transactions
+      .reduce((sum, val) => {
+        const existing = sum.find(
+          (f) =>
+            f.account == val.account &&
+            dayjs(val.date).utcOffset(offset).endOf("month").valueOf() ==
+              dayjs(f.date).utcOffset(offset).endOf("month").valueOf()
+        );
+        if (!existing) {
+          const date = dayjs(val.date)
+            .utcOffset(offset)
+            .endOf("month")
+            .valueOf();
+          const matchedTrxs = transactions.filter(
+            (f) =>
+              f.account == val.account &&
+              dayjs(f.date).utcOffset(offset).endOf("month").valueOf() == date
+          );
+          sum.push({
+            account: val.account,
+            date,
+            count: matchedTrxs.length,
+            balance: matchedTrxs.reduce((total, tr) => {
+              return total + tr.amount;
+            }, 0),
+            timestamp: Date.now(),
+          });
+        }
+        return sum;
+      }, [] as AccountBalance[])
+      .map((bal) => {
+        // Map previous balance if exists
+        const prevBal = prevs.find((f) => f.account == bal.account);
+        if (prevBal) {
+          bal.balance += prevBal.balance;
+        }
+        return bal;
+      })
+      .sort((a, b) => b.date - a.date);
+    const diff = end.diff(start, "month");
+
+    // Fill empty month without transaction wit previous balance
+    Array.from(Array(diff + 1).keys())
+      .map((key) => {
+        return start.add(key, "month").endOf("month").valueOf();
+      })
+      .forEach((endDate) => {
+        const hasBalance = balances.find((f) => f.date == endDate);
+        if (!hasBalance) {
+          // Find nearest last month
+          const last = balances.find((f) => f.date < endDate);
+          if (last) {
+            // Copy balance with different date to fill empty gap
+            balances
+              .filter((f) => f.date == last.date)
+              .map((m) => ({
+                ...m,
+                date: endDate,
+              }))
+              .forEach((f) => balances.push(f));
+          }
+        }
+      });
+
+    return balances;
   }
 
   async setInfo(info: Partial<BookInfo>) {
@@ -197,7 +319,6 @@ export class Book {
       date,
       timestamp: Date.now(),
     });
-    console.log("set account balance", accBalance);
     await ref.set(accBalance);
     return accBalance;
   }
@@ -246,20 +367,20 @@ export class Book {
     });
   }
 
-  async getJournals(period?: number) {
+  async getJournals(start?: number, end?: number) {
     const ref = this.journalRef;
     const offset = await this.getBookOffset();
 
     // Start and end period for defined month based on book timezone
-    const start = day(period).utcOffset(offset).startOf("month").valueOf();
-    const end = day(period).utcOffset(offset).endOf("month").valueOf();
+    const startDate = day(start).utcOffset(offset).startOf("month").valueOf();
+    const endDate = day(end).utcOffset(offset).endOf("month").valueOf();
 
     // Get previous balance
 
     const snapshots = await ref
       .orderByChild("date")
-      .startAt(start)
-      .endAt(end)
+      .startAt(startDate)
+      .endAt(endDate)
       .get();
 
     const data: JournalData[] = [];
@@ -298,6 +419,17 @@ export class Book {
       id,
     });
     await this.ref.child("accounts").child(id).set(acc);
+
+    // Create previous period account balance to 0
+    const period = dayjs()
+      .utcOffset(await this.getBookOffset())
+      .subtract(1, "month")
+      .valueOf();
+
+    await this.setAccountBalance(period, {
+      account: acc.id,
+      balance: 0,
+    });
     return acc;
   }
 

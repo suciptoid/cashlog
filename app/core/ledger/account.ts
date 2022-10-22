@@ -37,7 +37,9 @@ export const AccountBalanceSchema = z.object({
   date: z.number(),
   timestamp: z.number().default(Date.now()),
   account: z.string(),
+  count: z.number().default(0),
 });
+export type AccountBalance = z.infer<typeof AccountBalanceSchema>;
 
 export const AccountBalanceSnap = z.map(z.string(), AccountBalanceSchema);
 

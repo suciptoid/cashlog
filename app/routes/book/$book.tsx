@@ -1,4 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Link, Outlet, useLocation, useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -14,9 +15,13 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const p = BookParams.parse(params);
   const book = Book.withId(p.book);
 
-  const data = await book.getData();
-
-  return data;
+  try {
+    const data = await book.getData();
+    return data;
+  } catch (e) {
+    console.log("book not found");
+    throw redirect("/book/setup");
+  }
 };
 
 export default function BookPage() {
