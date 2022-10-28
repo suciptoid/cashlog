@@ -39,7 +39,7 @@
     "@remix-run/eslint-config": "^1.7.3",
     "@remix-run/serve": "^1.7.3",
     "@trivago/prettier-plugin-sort-imports": "^3.4.0",
-    "@types/react": "^18.0.21",
+    "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.6",
     "@vitest/coverage-c8": "^0.24.3",
     "@vitest/ui": "^0.24.3",
